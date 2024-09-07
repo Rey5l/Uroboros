@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1085823740843",
+    "project_id": "uroboros-4cc4c",
+    "storage_bucket": "uroboros-4cc4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085823740843:android:52cb19b717233ea51040ee",
+        "android_client_info": {
+          "package_name": "com.reysl.uroboros"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt59o1N73b-WG81L51_lmxDjCdQpiYgSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

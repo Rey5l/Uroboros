@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Uroboros</string>
+    <string name="uroboros">Uroboros</string>
+    <string name="main_text">Добавляйте материал, который хотите запомнить, и Uroboros будет напоминать вам о нем, на основе метода интервальных повторений</string>
+</resources>
