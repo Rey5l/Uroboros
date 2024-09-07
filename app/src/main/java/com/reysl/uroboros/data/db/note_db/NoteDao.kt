@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.reysl.uroboros.data.Note
-import com.reysl.uroboros.data.Tag
 
 @Dao
 interface NoteDao {
@@ -18,7 +17,7 @@ interface NoteDao {
     fun addNote(note: Note)
 
     @Query("DELETE FROM NOTE WHERE id = :id")
-    fun deleteNote(id: Int)
+    fun deleteNote(id: Long)
 
     @Update
     suspend fun updateNote(note: Note)

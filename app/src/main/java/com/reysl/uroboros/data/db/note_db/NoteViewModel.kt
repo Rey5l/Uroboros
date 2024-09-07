@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.reysl.uroboros.MainApplication
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.Tag
-import com.reysl.uroboros.data.db.tag_db.TagDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -69,7 +68,7 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    fun deleteNote(id: Int) {
+    fun deleteNote(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             noteDao.deleteNote(id)
         }
