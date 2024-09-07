@@ -17,7 +17,9 @@ class MainApplication: Application() {
             applicationContext,
             NoteDatabase::class.java,
             NoteDatabase.NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
         tagDatabase = Room.databaseBuilder(
             applicationContext,
             TagDatabase::class.java,

@@ -32,10 +32,16 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 
 @Composable
-fun NotesPage(authViewModel: AuthViewModel, navController: NavController, noteViewModel: NoteViewModel, tagViewModel: TagViewModel) {
+fun NotesPage(
+    authViewModel: AuthViewModel,
+    navController: NavController,
+    noteViewModel: NoteViewModel,
+    tagViewModel: TagViewModel
+) {
 
     var showDialog by remember { mutableStateOf(false) }
     var latestTitle by remember { mutableStateOf("") }
+    var styledText by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     Column(
@@ -113,7 +119,12 @@ fun NotesPage(authViewModel: AuthViewModel, navController: NavController, noteVi
                 .weight(1f)
                 .background(colorResource(id = R.color.white))
         ) {
-            RichTextEditor()
+            RichTextEditor(
+                initialText = styledText,
+                onTextChange = { updatedText ->
+                    styledText = updatedText
+                }
+            )
         }
     }
     if (showDialog) {
@@ -129,11 +140,14 @@ fun NotesPage(authViewModel: AuthViewModel, navController: NavController, noteVi
 }
 
 @Composable
-fun RichTextEditor() {
+fun RichTextEditor(
+    onTextChange: (String) -> Unit,
+    initialText: String = ""
+) {
     var textFieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = "",
+                text = initialText,
                 selection = TextRange(0, 0)
             )
         )
@@ -160,6 +174,7 @@ fun RichTextEditor() {
             annotatedString = newAnnotatedString,
             selection = textFieldValue.selection
         )
+        onTextChange(styledText.toString())
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -222,14 +237,22 @@ fun RichTextEditor() {
                         annotatedString = buildAnnotatedString {
                             append(newValue.text)
                             styledText.spanStyles.forEach { spanStyle ->
-                                addStyle(spanStyle.item, spanStyle.start.coerceIn(0, newValue.text.length), spanStyle.end.coerceIn(0, newValue.text.length))
+                                addStyle(
+                                    spanStyle.item,
+                                    spanStyle.start.coerceIn(0, newValue.text.length),
+                                    spanStyle.end.coerceIn(0, newValue.text.length)
+                                )
                             }
                         }
                     )
                     styledText = buildAnnotatedString {
                         append(newValue.text)
                         styledText.spanStyles.forEach { spanStyle ->
-                            addStyle(spanStyle.item, spanStyle.start.coerceIn(0, newValue.text.length), spanStyle.end.coerceIn(0, newValue.text.length))
+                            addStyle(
+                                spanStyle.item,
+                                spanStyle.start.coerceIn(0, newValue.text.length),
+                                spanStyle.end.coerceIn(0, newValue.text.length)
+                            )
                         }
                     }
                 },
@@ -262,4 +285,26 @@ fun RichTextEditor() {
 fun formatTime(time: Date): String {
     val simpleDateFormat = SimpleDateFormat("dd.MM")
     return simpleDateFormat.format(time)
+}
+
+fun AnnotatedString.toHtml(): String {
+    val sb = StringBuilder()
+    this.spanStyles.forEach { spanStyle ->
+        when (spanStyle.item.fontWeight) {
+            FontWeight.Bold -> sb.append("<b>${this.text}</b>")
+            else -> sb.append(this.text)
+        }
+    }
+    return sb.toString()
+}
+
+fun String.fromHtmlToAnnotatedString(): AnnotatedString {
+    val annotatedString = AnnotatedString.Builder()
+    if (this.contains("<b>")) {
+        val boldText = this.substringAfter("<b>").substringBefore("</b>")
+        annotatedString.append(boldText, SpanStyle(fontWeight = FontWeight.Bold).toString())
+    } else {
+        annotatedString.append(this)
+    }
+    return annotatedString.toAnnotatedString()
 }
