@@ -10,6 +10,7 @@ import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.time.Instant
 
@@ -18,7 +19,7 @@ class NoteViewModel : ViewModel() {
     val tagDao = MainApplication.tagDatabase.getTagDao()
     val noteList: LiveData<List<Note>> = noteDao.getAllNote()
 
-    fun addNote(title: String, description: String, tag: String, context: Context) {
+    fun addNote(title: String, description: String, tag: String, markdownText: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 tagDao.addTag(Tag(tag = tag))
@@ -28,11 +29,14 @@ class NoteViewModel : ViewModel() {
                         description = description,
                         isFavourite = false,
                         tag = tag,
+                        styledText = markdownText,
                         time = Date.from(Instant.now())
                     )
                 )
             } catch (e: Exception) {
-                Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
+                }
             }
 
 
@@ -50,7 +54,9 @@ class NoteViewModel : ViewModel() {
                     tagDao.deleteTagByName(tag)
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Не получилось удалить материал", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
+                }
             }
 
         }

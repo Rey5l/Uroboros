@@ -24,11 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.ItemCard
 
 @Composable
-fun TagHomeContent(tagViewModel: TagViewModel) {
+fun TagHomeContent(tagViewModel: TagViewModel, navController: NavController) {
     val tagList by tagViewModel.tagList.observeAsState(emptyList())
     if (tagList.isNotEmpty()) {
         var currentItem by remember {
