@@ -13,6 +13,7 @@ data class Note(
     val description: String,
     val isFavourite: Boolean,
     val tag: String,
+    val styledText: String,
     val time: Date
 )
 

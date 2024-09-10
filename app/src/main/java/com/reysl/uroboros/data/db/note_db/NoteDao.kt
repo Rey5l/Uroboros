@@ -19,7 +19,7 @@ interface NoteDao {
     @Query("DELETE FROM NOTE WHERE id = :id")
     fun deleteNote(id: Long)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateNote(note: Note)
 
     @Query("Select Count(*) From Note Where tag = :tag")

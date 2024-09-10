@@ -1,6 +1,7 @@
 package com.reysl.uroboros
 
 import android.content.ContentProvider
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +52,13 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .clickable { navController.navigate("note_screen") },
+            .clickable {
+                try {
+                    navController.navigate("note_screen/${note.title}/${note.styledText}/${note.tag}")
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT).show()
+                }
+            },
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_color)),
         shape = RoundedCornerShape(corner = CornerSize(14.dp)),
@@ -76,7 +83,7 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                             tint = colorResource(id = R.color.green),
                             contentDescription = "Delete",
                             modifier = Modifier.size(25.dp),
-                            )
+                        )
                     }
                     IconButton(onClick = { isFilledStar = !isFilledStar }) {
                         if (isFilledStar) {

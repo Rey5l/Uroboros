@@ -110,7 +110,7 @@ fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteVie
                 Row(
                     modifier = Modifier.padding(start = 43.dp)
                 ) {
-                    TagHomeContent(tagViewModel = tagViewModel)
+                    TagHomeContent(tagViewModel = tagViewModel, navController)
                 }
                 NoteHomeContent(modifier = Modifier.padding(bottom = 60.dp), viewModel = NoteViewModel(), navController = navController)
             }

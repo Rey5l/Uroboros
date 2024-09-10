@@ -131,7 +131,7 @@ fun NotesPage(
         AddMaterialDialog(
             onDismissRequest = { showDialog = false },
             onAddMaterial = { title, description, tag ->
-                noteViewModel.addNote(title, description, tag, context)
+                noteViewModel.addNote(title, description, tag, styledText, context)
                 showDialog = false
                 latestTitle = title
             }
@@ -174,7 +174,7 @@ fun RichTextEditor(
             annotatedString = newAnnotatedString,
             selection = textFieldValue.selection
         )
-        onTextChange(styledText.toString())
+        onTextChange(styledText.text)
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -255,6 +255,7 @@ fun RichTextEditor(
                             )
                         }
                     }
+                    onTextChange(styledText.text)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,22 +290,55 @@ fun formatTime(time: Date): String {
 
 fun AnnotatedString.toHtml(): String {
     val sb = StringBuilder()
-    this.spanStyles.forEach { spanStyle ->
-        when (spanStyle.item.fontWeight) {
-            FontWeight.Bold -> sb.append("<b>${this.text}</b>")
-            else -> sb.append(this.text)
+
+    var currentPosition = 0
+    for (styleRange in this.spanStyles) {
+        sb.append(this.text.substring(currentPosition, styleRange.start))
+        val styledText = this.text.substring(styleRange.start, styleRange.end)
+        when {
+            styleRange.item.fontWeight == FontWeight.Bold -> sb.append("<b>$styledText</b>")
+            styleRange.item.fontStyle == FontStyle.Italic -> sb.append("<i>$styledText</i>")
+            else -> sb.append(styledText)
         }
+        currentPosition = styleRange.end
     }
+    if (currentPosition < this.text.length) {
+        sb.append(this.text.substring(currentPosition))
+    }
+
     return sb.toString()
 }
 
 fun String.fromHtmlToAnnotatedString(): AnnotatedString {
-    val annotatedString = AnnotatedString.Builder()
-    if (this.contains("<b>")) {
-        val boldText = this.substringAfter("<b>").substringBefore("</b>")
-        annotatedString.append(boldText, SpanStyle(fontWeight = FontWeight.Bold).toString())
-    } else {
-        annotatedString.append(this)
+    val annotatedStringBuilder = AnnotatedString.Builder()
+    var currentPosition = 0
+    var remainingText = this
+
+    while (remainingText.isNotEmpty()) {
+        when {
+            remainingText.startsWith("<b>") -> {
+                val boldText = remainingText.substringAfter("<b>").substringBefore("</b>")
+                annotatedStringBuilder.append(
+                    boldText,
+                    SpanStyle(fontWeight = FontWeight.Bold).toString()
+                )
+                remainingText = remainingText.substringAfter("</b>")
+            }
+            remainingText.startsWith("<i>") -> {
+                val italicText = remainingText.substringAfter("<i>").substringBefore("</i>")
+                annotatedStringBuilder.append(
+                    italicText,
+                    SpanStyle(fontStyle = FontStyle.Italic).toString()
+                )
+                remainingText = remainingText.substringAfter("</i>")
+            }
+            else -> {
+                val normalText = remainingText.takeWhile { it != '<' }
+                annotatedStringBuilder.append(normalText)
+                remainingText = remainingText.drop(normalText.length)
+            }
+        }
     }
-    return annotatedString.toAnnotatedString()
+
+    return annotatedStringBuilder.toAnnotatedString()
 }

@@ -58,9 +58,12 @@ fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 tagViewModel = TagViewModel()
             )
         }
-        composable("note_screen") {
+        composable("note_screen/{title}/{content}/{tag}") { backStackEntry ->
             showBottomBar.value = false
-            NoteScreen(navController = navController)
+            val noteTitle = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
+            val noteContent = backStackEntry.arguments?.getString("content") ?: "No content available"
+            val noteTag = backStackEntry.arguments?.getString("tag") ?: "No content available"
+            NoteScreen(navController = navController, noteTitle = noteTitle, noteContent = noteContent, noteTag)
         }
     }
 
