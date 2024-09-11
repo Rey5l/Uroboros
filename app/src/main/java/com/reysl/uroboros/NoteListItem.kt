@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -47,6 +50,10 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
         mutableStateOf(false)
     }
 
+    var showDeleteConfirmationDialog by remember {
+        mutableStateOf(false)
+    }
+
 
     Card(
         modifier = Modifier
@@ -56,7 +63,9 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                 try {
                     navController.navigate("note_screen/${note.title}/${note.styledText}/${note.tag}")
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT).show()
+                    Toast
+                        .makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT)
+                        .show()
                 }
             },
         elevation = CardDefaults.cardElevation(2.dp),
@@ -76,7 +85,7 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(onClick = {
-                        viewModel.deleteAndCleaning(note, context)
+                        showDeleteConfirmationDialog = true
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.delete),
@@ -84,6 +93,14 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                             contentDescription = "Delete",
                             modifier = Modifier.size(25.dp),
                         )
+                    }
+                    if (showDeleteConfirmationDialog) {
+                        DeleteConfirmationDialog(onDeleteConfirmed = {
+                            viewModel.deleteAndCleaning(note, context)
+                            showDeleteConfirmationDialog = false
+                        }, onDismiss = {
+                            showDeleteConfirmationDialog = false
+                        })
                     }
                     IconButton(onClick = { isFilledStar = !isFilledStar }) {
                         if (isFilledStar) {
@@ -172,4 +189,57 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
 fun formatTime(time: java.util.Date): String {
     val simpleDateFormat = SimpleDateFormat("dd.MM")
     return simpleDateFormat.format(time)
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onDeleteConfirmed: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Удалить материал",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Text(
+                "Вы уверены, что хотите удалить материал?",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onDeleteConfirmed, colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.green)
+                )
+            ) {
+                Text(
+                    "Удалить",
+                    color = colorResource(R.color.card_color),
+                    fontFamily = acherusFeral,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss, colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.light_green)
+                )
+            ) {
+                Text(
+                    "Отмена",
+                    color = colorResource(R.color.green),
+                    fontFamily = acherusFeral,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    )
 }

@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.ui.theme.UroborosTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,12 +20,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val authViewModel: AuthViewModel by viewModels()
+        val noteViewModel: NoteViewModel by viewModels()
         setContent {
             UroborosTheme {
                 Scaffold { innerPadding ->
                     AppNavigation(
                         modifier = Modifier.padding(innerPadding),
-                        authViewModel = authViewModel
+                        authViewModel = authViewModel,
+                        noteViewModel = noteViewModel,
                     )
                 }
             }

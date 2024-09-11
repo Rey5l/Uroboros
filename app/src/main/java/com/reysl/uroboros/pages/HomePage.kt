@@ -55,13 +55,7 @@ import com.reysl.uroboros.data.db.tag_db.TagViewModel
 fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteViewModel: NoteViewModel, tagViewModel: TagViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
-    val tagList by tagViewModel.tagList.observeAsState(emptyList())
-//    val itemsList = listOf(
-//        Tag("Education"),
-//        Tag("Marketing"),
-//        Tag("Sport"),
-//        Tag("Programming")
-//    )
+    
 
     LaunchedEffect(authState.value) {
         when (authState.value) {

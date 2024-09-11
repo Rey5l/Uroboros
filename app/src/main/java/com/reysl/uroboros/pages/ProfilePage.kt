@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,6 +70,10 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         mutableStateOf(false)
     }
 
+    var showSignoutConfirmationDialog by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Unauthenticated -> navController.navigate("login")
@@ -88,13 +92,22 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 .padding(top = 30.dp, end = 10.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
-            IconButton(onClick = { authViewModel.signout() }) {
+            IconButton(onClick = { showSignoutConfirmationDialog = true }) {
                 Image(
                     painter = painterResource(id = R.drawable.log_out),
                     contentDescription = "Log out",
                     modifier = Modifier.size(28.dp)
                 )
             }
+
+        }
+        if (showSignoutConfirmationDialog) {
+            SignoutConfirmationDialog(onSignoutConfirmed = {
+                authViewModel.signout()
+                showSignoutConfirmationDialog = false
+            }, onDismiss = {
+                showSignoutConfirmationDialog = false
+            })
         }
         Box(
             contentAlignment = Alignment.Center,
@@ -147,7 +160,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     fontSize = 16.sp,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(value = name, onValueChange = {name = it})
+                OutlinedTextField(value = name, onValueChange = { name = it })
             }
 
         }
@@ -179,13 +192,19 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     trailingIcon = {
                         IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
                             if (isPasswordShow) {
-                                Icon(painter = painterResource(id = R.drawable.close_eye), contentDescription = "show")
+                                Icon(
+                                    painter = painterResource(id = R.drawable.close_eye),
+                                    contentDescription = "show"
+                                )
                             } else {
-                                Icon(painter = painterResource(id = R.drawable.eye), contentDescription = "don't show")
+                                Icon(
+                                    painter = painterResource(id = R.drawable.eye),
+                                    contentDescription = "don't show"
+                                )
                             }
                         }
                     },
-                    visualTransformation = if(isPasswordShow) VisualTransformation.None else PasswordVisualTransformation()
+                    visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation()
                 )
             }
 
@@ -209,13 +228,19 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     trailingIcon = {
                         IconButton(onClick = { isNewPasswordShow = !isNewPasswordShow }) {
                             if (isNewPasswordShow) {
-                                Icon(painter = painterResource(id = R.drawable.close_eye), contentDescription = "show")
+                                Icon(
+                                    painter = painterResource(id = R.drawable.close_eye),
+                                    contentDescription = "show"
+                                )
                             } else {
-                                Icon(painter = painterResource(id = R.drawable.eye), contentDescription = "don't show")
+                                Icon(
+                                    painter = painterResource(id = R.drawable.eye),
+                                    contentDescription = "don't show"
+                                )
                             }
                         }
                     },
-                    visualTransformation = if(isNewPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (isNewPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
                 )
             }
 
@@ -246,4 +271,50 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
 
 
     }
+}
+
+@Composable
+fun SignoutConfirmationDialog(
+    onSignoutConfirmed: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Выйти из аккаунта",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "Вы уверены, что хотите выйти из аккаунта?",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onSignoutConfirmed,
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.green))
+            ) {
+                Text(
+                    text = "Выйти",
+                    color = colorResource(id = R.color.card_color),
+                    fontFamily = acherusFeral,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.card_color))
+            ) {
+                Text(text = "Отмена", color = colorResource(id = R.color.green))
+            }
+        }
+    )
 }
