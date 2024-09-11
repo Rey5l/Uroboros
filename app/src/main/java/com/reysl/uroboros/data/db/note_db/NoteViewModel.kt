@@ -55,7 +55,7 @@ class NoteViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Не получилось удалить материал", Toast.LENGTH_SHORT).show()
                 }
             }
 

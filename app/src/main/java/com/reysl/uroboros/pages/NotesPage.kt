@@ -259,8 +259,8 @@ fun RichTextEditor(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
-                    .padding(5.dp),
+                    .height(400.dp),
+//                    .padding(5.dp)
                 textStyle = TextStyle(
                     color = Color.Black,
                     fontFamily = acherusFeral,

@@ -18,6 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,10 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,7 +49,14 @@ import com.reysl.uroboros.data.db.note_db.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteScreen(navController: NavController, noteTitle: String, noteContent: String, noteTag: String) {
+fun NoteScreen(
+    navController: NavController,
+    noteTitle: String,
+    noteContent: String,
+    noteTag: String,
+) {
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -61,13 +70,18 @@ fun NoteScreen(navController: NavController, noteTitle: String, noteContent: Str
                     )
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Menu",
                             tint = colorResource(id = R.color.card_color)
                         )
                     }
+//                    DropdownMenu(expanded = true, onDismissRequest = {  }) {
+//                        DropdownMenuItem(text = { Text(text = "Удалить") }, onClick = {
+//
+//                        })
+//                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("home") }) {
@@ -129,6 +143,8 @@ fun NoteScreen(navController: NavController, noteTitle: String, noteContent: Str
     }
 }
 
+
+
 @Composable
 fun TagSection(tag: String) {
     Row(
@@ -142,7 +158,12 @@ fun TagSection(tag: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = tag, color = colorResource(id = R.color.green), fontWeight = FontWeight.Bold, fontFamily = acherusFeral)
+        Text(
+            text = tag,
+            color = colorResource(id = R.color.green),
+            fontWeight = FontWeight.Bold,
+            fontFamily = acherusFeral
+        )
     }
 }
 
@@ -157,3 +178,5 @@ fun TextContent(noteContent: String) {
         fontWeight = FontWeight.Light
     )
 }
+
+

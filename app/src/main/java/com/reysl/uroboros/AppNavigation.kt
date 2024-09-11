@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,11 +19,12 @@ import java.time.Instant
 import java.util.Date
 
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
+fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel, noteViewModel: NoteViewModel) {
     val navController = rememberNavController()
-    var showBottomBar = remember {
+    val showBottomBar = remember {
         mutableStateOf(true)
     }
+
     NavHost(navController = navController, startDestination = "start_screen") {
         composable("start_screen") {
             showBottomBar.value = false
@@ -63,7 +65,7 @@ fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             val noteTitle = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
             val noteContent = backStackEntry.arguments?.getString("content") ?: "No content available"
             val noteTag = backStackEntry.arguments?.getString("tag") ?: "No content available"
-            NoteScreen(navController = navController, noteTitle = noteTitle, noteContent = noteContent, noteTag)
+            NoteScreen(navController = navController, noteTitle = noteTitle, noteContent = noteContent, noteTag, )
         }
     }
 
