@@ -200,7 +200,7 @@ fun DeleteConfirmationDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Удалить материал",
+                text = "Удалить материал",  
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Bold,
             )

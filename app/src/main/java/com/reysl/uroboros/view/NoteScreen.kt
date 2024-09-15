@@ -69,20 +69,6 @@ fun NoteScreen(
                         color = colorResource(id = R.color.white)
                     )
                 },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Menu",
-                            tint = colorResource(id = R.color.card_color)
-                        )
-                    }
-//                    DropdownMenu(expanded = true, onDismissRequest = {  }) {
-//                        DropdownMenuItem(text = { Text(text = "Удалить") }, onClick = {
-//
-//                        })
-//                    }
-                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("home") }) {
                         Icon(

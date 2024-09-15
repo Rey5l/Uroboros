@@ -18,6 +18,7 @@ import com.reysl.uroboros.ui.theme.UroborosTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkAndRequestNotificationPermission(this)
         enableEdgeToEdge()
         val authViewModel: AuthViewModel by viewModels()
         val noteViewModel: NoteViewModel by viewModels()
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+
         }
     }
 }
