@@ -55,7 +55,6 @@ dependencies {
 
     implementation(libs.firebase.auth)
     implementation(libs.androidx.runtime.livedata)
-    val nav_version = "2.7.7"
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.core.ktx)
@@ -81,6 +80,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+
+    val work_version = "2.9.1"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 
 
 }
