@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.reysl.uroboros.MainApplication
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.Tag
+import com.reysl.uroboros.scheduleReminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,6 +34,10 @@ class NoteViewModel : ViewModel() {
                         time = Date.from(Instant.now())
                     )
                 )
+                val forgettingCurveIntervals = listOf(1L, 3L, 7L, 14L)
+                forgettingCurveIntervals.forEach { days ->
+                    scheduleReminder(context, days)
+                }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
