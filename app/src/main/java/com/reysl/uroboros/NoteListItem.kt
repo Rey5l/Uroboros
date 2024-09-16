@@ -61,7 +61,7 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
             .fillMaxWidth()
             .clickable {
                 try {
-                    navController.navigate("note_screen/${note.title}/${note.styledText}/${note.tag}")
+                    navController.navigate("note_screen/${note.id}/${note.title}/${note.styledText}/${note.tag}")
                 } catch (e: Exception) {
                     Toast
                         .makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT)

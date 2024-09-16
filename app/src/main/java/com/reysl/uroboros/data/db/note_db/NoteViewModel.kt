@@ -24,7 +24,7 @@ class NoteViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 tagDao.addTag(Tag(tag = tag))
-                noteDao.addNote(
+                val noteId = noteDao.addNote(
                     Note(
                         title = title,
                         description = description,
@@ -36,7 +36,7 @@ class NoteViewModel : ViewModel() {
                 )
                 val forgettingCurveIntervals = listOf(1L, 3L, 7L, 14L)
                 forgettingCurveIntervals.forEach { days ->
-                    scheduleReminder(context, days)
+                    scheduleReminder(context, noteId, title, markdownText, days)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
