@@ -14,7 +14,7 @@ interface NoteDao {
     fun getAllNote(): LiveData<List<Note>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addNote(note: Note)
+    fun addNote(note: Note): Long
 
     @Query("DELETE FROM NOTE WHERE id = :id")
     fun deleteNote(id: Long)

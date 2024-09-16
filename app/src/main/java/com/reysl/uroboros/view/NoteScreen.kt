@@ -1,5 +1,6 @@
 package com.reysl.uroboros.view
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +36,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +48,7 @@ import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import com.reysl.uroboros.scheduleReminder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,5 +167,6 @@ fun TextContent(noteContent: String) {
         fontWeight = FontWeight.Light
     )
 }
+
 
 

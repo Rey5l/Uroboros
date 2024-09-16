@@ -19,7 +19,13 @@ import java.time.Instant
 import java.util.Date
 
 @Composable
-fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel, noteViewModel: NoteViewModel) {
+fun AppNavigation(
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel,
+    noteViewModel: NoteViewModel,
+    navController: NavController,
+    startDestination: String
+) {
     val navController = rememberNavController()
     val showBottomBar = remember {
         mutableStateOf(true)
@@ -60,12 +66,21 @@ fun AppNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel, n
                 tagViewModel = TagViewModel()
             )
         }
-        composable("note_screen/{title}/{content}/{tag}") { backStackEntry ->
+        composable("note_screen/{noteId}/{title}/{content}/{tag}") { backStackEntry ->
             showBottomBar.value = false
+            val noteId = backStackEntry.arguments?.getString("noteId") ?: -1L
             val noteTitle = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
-            val noteContent = backStackEntry.arguments?.getString("content") ?: "No content available"
+            val noteContent =
+                backStackEntry.arguments?.getString("content") ?: "No content available"
             val noteTag = backStackEntry.arguments?.getString("tag") ?: "No content available"
-            NoteScreen(navController = navController, noteTitle = noteTitle, noteContent = noteContent, noteTag, )
+            if (noteId != -1L) {
+                NoteScreen(
+                    navController = navController,
+                    noteTitle = noteTitle,
+                    noteContent = noteContent,
+                    noteTag,
+                )
+            }
         }
     }
 
