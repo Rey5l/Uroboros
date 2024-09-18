@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +49,10 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
         mutableStateOf("")
     }
 
+    var isPasswordShow by remember {
+        mutableStateOf(false)
+    }
+
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
@@ -59,6 +64,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                 (authState.value as AuthState.Error).message,
                 Toast.LENGTH_SHORT
             ).show()
+
             else -> Unit
         }
     }
@@ -157,16 +163,31 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             label = {
                 Text(text = "Введите пароль")
             },
+            trailingIcon = {
+                IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
+                    if (isPasswordShow) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close_eye),
+                            contentDescription = "show"
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.eye),
+                            contentDescription = "don't show"
+                        )
+                    }
+                }
+            },
+            visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .padding(start = 50.dp),
-            visualTransformation = PasswordVisualTransformation()
         )
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { authViewModel.registration(email, password) },
+                onClick = { authViewModel.registration(email, password, username) },
                 enabled = authState.value != AuthState.Loading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(id = R.color.green),

@@ -54,7 +54,10 @@ android {
 dependencies {
 
     implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.runtime.livedata)
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.core.ktx)
@@ -73,7 +76,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // added dependencies
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")

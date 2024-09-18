@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +47,10 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
 
     var password by remember {
         mutableStateOf("")
+    }
+
+    var isPasswordShow by remember {
+        mutableStateOf(false)
     }
 
     val authState = authViewModel.authState.observeAsState()
@@ -135,9 +142,24 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
             label = {
                 Text(text = "Введите пароль")
             },
+            trailingIcon = {
+                IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
+                    if (isPasswordShow) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close_eye),
+                            contentDescription = "show"
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.eye),
+                            contentDescription = "don't show"
+                        )
+                    }
+                }
+            },
+            visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .padding(start = 50.dp),
-            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(25.dp))
         Box(
