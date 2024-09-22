@@ -40,8 +40,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthState
 import com.reysl.uroboros.AuthViewModel
+import com.reysl.uroboros.AuthViewModel.*
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 
@@ -55,7 +55,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
     }
 
     var oldPassword by remember {
-        mutableStateOf("oldPassword")
+        mutableStateOf("")
     }
 
     var newPassword by remember {
@@ -74,12 +74,39 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         mutableStateOf(false)
     }
 
+    var showSuccessDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showErrorDialog by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    var showSuccessChangeNameDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showErrorChangeNameDialog by remember {
+        mutableStateOf<String?>(null)
+    }
+
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Unauthenticated -> navController.navigate("login")
+            is AuthState.Success -> {
+                showSuccessDialog = true
+            }
+
+
+            is AuthState.Error -> {
+                showErrorDialog = (authState.value as AuthState.Error).message
+            }
+
             else -> Unit
         }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -248,7 +275,11 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         Spacer(modifier = Modifier.height(30.dp))
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
-                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+                onClick = {
+                    if (newPassword.isNotEmpty() && oldPassword.isNotEmpty()) {
+                        authViewModel.changePassword(oldPassword, newPassword)
+                    }
+                }, colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(
                         id = R.color.green
                     ),
@@ -265,6 +296,62 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     fontFamily = acherusFeral,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
+                )
+            }
+            if (showSuccessDialog) {
+                AlertDialog(
+                    onDismissRequest = { showSuccessDialog = false },
+                    title = { Text(text = "Успех!") },
+                    text = {
+                        Text(
+                            text = "Пароль успешно изменен!"
+                        )
+                    },
+                    confirmButton = {
+                        Button(onClick = { showSuccessDialog = false }) {
+                            Text(text = "OK")
+                        }
+                    }
+                )
+            }
+
+            if (showErrorDialog != null) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = null },
+                    title = { Text(text = "Ошибка!") },
+                    text = { Text(text = "Не удалось изменить пароль") },
+                    confirmButton = {
+                        Button(onClick = { showErrorDialog = null }) {
+                            Text(text = "ОК")
+                        }
+                    }
+                )
+            }
+
+            if (showSuccessChangeNameDialog) {
+                AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false }, title = {
+                    Text(
+                        text = "Успех!"
+                    )
+                }, text = { Text(text = "Имя успешно изменено!") },
+                    confirmButton = {
+                        Button(onClick = { showSuccessChangeNameDialog = false }) {
+                            Text(text = "OK")
+                        }
+                    }
+                )
+            }
+
+            if (showErrorChangeNameDialog != null) {
+                AlertDialog(
+                    onDismissRequest = { showErrorChangeNameDialog = null },
+                    title = { Text(text = "Ошибка!") },
+                    text = { Text(text = "Не получилось сменить имя") },
+                    confirmButton = {
+                        Button(onClick = { showErrorChangeNameDialog = null }) {
+                            Text(text = "OK")
+                        }
+                    }
                 )
             }
         }
