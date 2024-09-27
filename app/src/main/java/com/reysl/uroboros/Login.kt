@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.reysl.uroboros.AuthViewModel.*
 
 @Composable
 fun Login(navController: NavController, authViewModel: AuthViewModel) {

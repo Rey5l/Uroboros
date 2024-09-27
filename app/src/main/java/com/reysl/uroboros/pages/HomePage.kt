@@ -41,8 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthState
 import com.reysl.uroboros.AuthViewModel
+import com.reysl.uroboros.AuthViewModel.*
 import com.reysl.uroboros.NoteHomeContent
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.R

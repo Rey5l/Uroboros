@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.reysl.uroboros.AuthViewModel.*
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.HomePage
