@@ -1,5 +1,6 @@
 package com.reysl.uroboros
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,6 +9,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import java.util.concurrent.TimeUnit
 
 class ReminderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {
@@ -17,6 +19,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : Worker(contex
 
         if (noteId != -1L) {
             sendNotification(noteId, noteTitle, noteContent)
+
+            scheduleFutureReminder(noteId, noteTitle, noteContent, 3)
         }
 
         return Result.success()
@@ -27,7 +31,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : Worker(contex
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+        val intent = Intent(applicationContext, ReminderReceiver::class.java).apply {
             action = "OPEN_NOTE"
             putExtra("note_id", noteId)
             putExtra("note_title", title)
@@ -61,5 +65,30 @@ class ReminderWorker(context: Context, params: WorkerParameters) : Worker(contex
         }
 
         notificationManager.notify(noteId.toInt(), notification)
+    }
+
+    private fun scheduleFutureReminder(noteId: Long, title: String, message: String, daysUntilReminder: Long) {
+        val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            putExtra("note_id", noteId)
+            putExtra("note_title", title)
+            putExtra("note_content", message)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            noteId.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val triggerTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(daysUntilReminder)
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerTime,
+            pendingIntent
+        )
     }
 }
