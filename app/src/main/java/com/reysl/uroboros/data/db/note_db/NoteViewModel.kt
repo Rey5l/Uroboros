@@ -35,8 +35,10 @@ class NoteViewModel : ViewModel() {
                     )
                 )
                 val forgettingCurveIntervals = listOf(1L, 3L, 7L, 14L)
+                var cumulativeDelay = 0L
                 forgettingCurveIntervals.forEach { days ->
-                    scheduleReminder(context, noteId, title, markdownText, days)
+                    cumulativeDelay += days
+                    scheduleReminder(context, noteId, title, markdownText, cumulativeDelay)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
