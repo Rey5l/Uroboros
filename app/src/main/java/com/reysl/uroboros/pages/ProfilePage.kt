@@ -1,5 +1,11 @@
 package com.reysl.uroboros.pages
 
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,15 +47,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.reysl.uroboros.AuthViewModel
-import com.reysl.uroboros.AuthViewModel.*
+import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
+
 
 @Composable
 fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
 
     val authState = authViewModel.authState.observeAsState()
+    val context = LocalContext.current
 
     var name by remember {
         mutableStateOf("user_001")
@@ -88,6 +102,27 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
 
     var showErrorChangeNameDialog by remember {
         mutableStateOf<String?>(null)
+    }
+
+    var avatarUri by remember { mutableStateOf<Uri?>(null) }
+
+    var imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            avatarUri = uri
+        }
+
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            val userRef = FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
+            userRef.get().addOnSuccessListener { document ->
+                if (document != null && document.contains("avatarUrl")) {
+                    val avatarUrl = document.getString("avatarUrl")
+                    avatarUri = Uri.parse(avatarUrl)
+                }
+            }
+        }
     }
 
     LaunchedEffect(authState.value) {
@@ -152,15 +187,10 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                         .border(2.dp, colorResource(id = R.color.green), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.avatar),
-                        contentDescription = "Profile Image",
-                        modifier = Modifier.size(100.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                    ProfileImage(imageUrl = avatarUri)
                 }
                 IconButton(
-                    onClick = { },
+                    onClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier
                         .size(24.dp)
                         .background(Color.White, CircleShape)
@@ -278,6 +308,20 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 onClick = {
                     if (newPassword.isNotEmpty() && oldPassword.isNotEmpty()) {
                         authViewModel.changePassword(oldPassword, newPassword)
+                    }
+                    if (avatarUri != null) {
+                        avatarUri.let { uri ->
+                            uploadImageToFirebase(uri, context) { downloadUri ->
+                                avatarUri = downloadUri
+                                saveAvatarUrlToDatabase(uri.toString())
+                            }
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Пожалуйста, выберите изображение!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }, colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(
@@ -404,4 +448,63 @@ fun SignoutConfirmationDialog(
             }
         }
     )
+}
+
+@Composable
+fun ProfileImage(imageUrl: Uri?) {
+    if (imageUrl != null) {
+        Image(
+            painter = rememberAsyncImagePainter(imageUrl),
+            contentDescription = "Profile Image",
+            modifier = Modifier.size(100.dp),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        Image(
+            painter = painterResource(id = R.drawable.avatar),
+            contentDescription = "Profile Image",
+            modifier = Modifier.size(100.dp),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+
+fun uploadImageToFirebase(uri: Uri?, context: Context, onImageUpload: (Uri) -> Unit) {
+    val storage = FirebaseStorage.getInstance()
+    val storageReference = storage.reference
+    val imageReference = storageReference.child("images/" + uri!!.lastPathSegment)
+
+    val uploadTask = uri.let { imageReference.putFile(it) }
+    uploadTask.addOnSuccessListener {
+        imageReference.downloadUrl.addOnSuccessListener { downloadUri ->
+            onImageUpload(downloadUri)
+            Toast.makeText(context, "Фото профиля успешно изменено", Toast.LENGTH_SHORT).show()
+        }
+    }.addOnFailureListener {
+        Toast.makeText(context, "Не получилось обновить фото профиля", Toast.LENGTH_SHORT).show()
+        Log.e("ErrorUpdateImage", it.toString())
+
+    }
+}
+
+fun saveAvatarUrlToDatabase(avatarUrl: String) {
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (currentUser != null) {
+        val userRef = db.collection("users").document(currentUser.uid)
+        val userData = hashMapOf(
+            "avatarUrl" to avatarUrl,
+            "updatedAt" to FieldValue.serverTimestamp()
+        )
+
+        userRef.set(userData)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Avatar URL updated successfully.")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error updating avatar URL", e)
+            }
+    }
 }
