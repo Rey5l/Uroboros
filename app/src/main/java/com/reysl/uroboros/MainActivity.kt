@@ -9,19 +9,16 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.ui.theme.UroborosTheme
-import com.reysl.uroboros.view.NoteScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkAndRequestNotificationPermission(this)
-
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         val authViewModel: AuthViewModel by viewModels()
         val noteViewModel: NoteViewModel by viewModels()
