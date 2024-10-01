@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +30,9 @@ fun NoteHomeContent(modifier: Modifier = Modifier, viewModel: NoteViewModel, nav
 
     if (notes.isNullOrEmpty()) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -54,7 +55,8 @@ fun NoteHomeContent(modifier: Modifier = Modifier, viewModel: NoteViewModel, nav
                 horizontal = 16.dp,
                 vertical = 8.dp
             ),
-            modifier = modifier.fillMaxHeight()
+            modifier = modifier
+                .fillMaxHeight()
         ) {
             items(
                 items = notes!!,

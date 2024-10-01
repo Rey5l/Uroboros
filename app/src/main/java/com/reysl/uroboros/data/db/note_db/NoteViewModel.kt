@@ -12,8 +12,8 @@ import com.reysl.uroboros.scheduleReminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Date
 import java.time.Instant
+import java.util.Date
 
 class NoteViewModel : ViewModel() {
     val noteDao = MainApplication.noteDatabase.getNoteDao()
@@ -69,21 +69,11 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    fun updateNoteTag(note: Note, newTag: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val oldTag = note.tag
-            noteDao.updateNote(note.copy(tag = newTag))
-            val oldTagCount = noteDao.getNotesCountByTag(oldTag)
-            if (oldTagCount == 0) {
-                tagDao.deleteTagByName(oldTag)
-            }
-            tagDao.addTag(Tag(tag = newTag))
-        }
-    }
-
-    fun deleteNote(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteDao.deleteNote(id)
+    fun searchNote(title: String): LiveData<List<Note>> {
+        return if (title.isNotEmpty()) {
+            noteDao.searchNotesByTitle(title)
+        } else {
+            noteDao.getAllNote()
         }
     }
 

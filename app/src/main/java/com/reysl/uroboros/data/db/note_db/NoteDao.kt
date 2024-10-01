@@ -25,5 +25,9 @@ interface NoteDao {
     @Query("Select Count(*) From Note Where tag = :tag")
     suspend fun getNotesCountByTag(tag: String): Int
 
+    @Query("SELECT * FROM Note WHERE title LIKE '%' || :title || '%'")
+    fun searchNotesByTitle(title: String): LiveData<List<Note>>
+
+
 
 }

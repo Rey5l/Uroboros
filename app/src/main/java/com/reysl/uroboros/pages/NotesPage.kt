@@ -2,20 +2,39 @@ package com.reysl.uroboros.pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -24,9 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.reysl.uroboros.AddMaterialDialog
 import com.reysl.uroboros.AuthViewModel
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
+import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -41,7 +60,7 @@ fun NotesPage(
 
     var showDialog by remember { mutableStateOf(false) }
     var latestTitle by remember { mutableStateOf("") }
-    var styledText by remember { mutableStateOf("") }
+    var styledText by remember { mutableStateOf(AnnotatedString("")) }
     val context = LocalContext.current
 
     Column(
@@ -131,7 +150,7 @@ fun NotesPage(
         AddMaterialDialog(
             onDismissRequest = { showDialog = false },
             onAddMaterial = { title, description, tag ->
-                noteViewModel.addNote(title, description, tag, styledText, context)
+                noteViewModel.addNote(title, description, tag, styledText.toHtml(), context)
                 showDialog = false
                 latestTitle = title
             }
@@ -141,13 +160,13 @@ fun NotesPage(
 
 @Composable
 fun RichTextEditor(
-    onTextChange: (String) -> Unit,
-    initialText: String = ""
+    onTextChange: (AnnotatedString) -> Unit,
+    initialText: AnnotatedString = AnnotatedString("")
 ) {
     var textFieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = initialText,
+                text = initialText.text,
                 selection = TextRange(0, 0)
             )
         )
@@ -174,7 +193,7 @@ fun RichTextEditor(
             annotatedString = newAnnotatedString,
             selection = textFieldValue.selection
         )
-        onTextChange(styledText.text)
+        onTextChange(styledText)
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -255,7 +274,7 @@ fun RichTextEditor(
                             )
                         }
                     }
-                    onTextChange(styledText.text)
+                    onTextChange(styledText)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -290,55 +309,41 @@ fun formatTime(time: Date): String {
 
 fun AnnotatedString.toHtml(): String {
     val sb = StringBuilder()
-
     var currentPosition = 0
-    for (styleRange in this.spanStyles) {
-        sb.append(this.text.substring(currentPosition, styleRange.start))
-        val styledText = this.text.substring(styleRange.start, styleRange.end)
-        when {
-            styleRange.item.fontWeight == FontWeight.Bold -> sb.append("<b>$styledText</b>")
-            styleRange.item.fontStyle == FontStyle.Italic -> sb.append("<i>$styledText</i>")
-            else -> sb.append(styledText)
+
+    val sortedStyles = this.spanStyles.sortedBy { it.start }
+
+    while (currentPosition < this.text.length) {
+        val nextStyle = sortedStyles.find { it.start >= currentPosition }
+        val nextStyleStart = nextStyle?.start ?: this.text.length
+
+        if (currentPosition < nextStyleStart) {
+            sb.append(this.text.substring(currentPosition, nextStyleStart))
+            currentPosition = nextStyleStart
         }
-        currentPosition = styleRange.end
-    }
-    if (currentPosition < this.text.length) {
-        sb.append(this.text.substring(currentPosition))
+
+        if (nextStyle != null) {
+            val styledText = this.text.substring(nextStyle.start, nextStyle.end)
+
+            when {
+                nextStyle.item.fontWeight == FontWeight.Bold && nextStyle.item.fontStyle == FontStyle.Italic -> {
+                    sb.append("<b><i>$styledText</i></b>")
+                }
+                nextStyle.item.fontWeight == FontWeight.Bold -> {
+                    sb.append("<b>$styledText</b>")
+                }
+                nextStyle.item.fontStyle == FontStyle.Italic -> {
+                    sb.append("<i>$styledText</i>")
+                }
+                else -> {
+                    sb.append(styledText)
+                }
+            }
+
+            currentPosition = nextStyle.end
+        }
     }
 
     return sb.toString()
 }
 
-fun String.fromHtmlToAnnotatedString(): AnnotatedString {
-    val annotatedStringBuilder = AnnotatedString.Builder()
-    var currentPosition = 0
-    var remainingText = this
-
-    while (remainingText.isNotEmpty()) {
-        when {
-            remainingText.startsWith("<b>") -> {
-                val boldText = remainingText.substringAfter("<b>").substringBefore("</b>")
-                annotatedStringBuilder.append(
-                    boldText,
-                    SpanStyle(fontWeight = FontWeight.Bold).toString()
-                )
-                remainingText = remainingText.substringAfter("</b>")
-            }
-            remainingText.startsWith("<i>") -> {
-                val italicText = remainingText.substringAfter("<i>").substringBefore("</i>")
-                annotatedStringBuilder.append(
-                    italicText,
-                    SpanStyle(fontStyle = FontStyle.Italic).toString()
-                )
-                remainingText = remainingText.substringAfter("</i>")
-            }
-            else -> {
-                val normalText = remainingText.takeWhile { it != '<' }
-                annotatedStringBuilder.append(normalText)
-                remainingText = remainingText.drop(normalText.length)
-            }
-        }
-    }
-
-    return annotatedStringBuilder.toAnnotatedString()
-}
