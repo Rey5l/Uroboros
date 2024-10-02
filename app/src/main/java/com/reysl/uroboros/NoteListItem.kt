@@ -1,6 +1,6 @@
 package com.reysl.uroboros
 
-import android.content.ContentProvider
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -34,8 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
@@ -61,7 +59,13 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
             .fillMaxWidth()
             .clickable {
                 try {
-                    navController.navigate("note_screen/${note.id}/${note.title}/${note.styledText}/${note.tag}")
+                    navController.navigate(
+                        "note_screen/${note.id}/${Uri.encode(note.title)}/${
+                            Uri.encode(
+                                note.styledText
+                            )
+                        }/${Uri.encode(note.tag)}"
+                    )
                 } catch (e: Exception) {
                     Toast
                         .makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT)
@@ -200,7 +204,7 @@ fun DeleteConfirmationDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Удалить материал",  
+                text = "Удалить материал",
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Bold,
             )

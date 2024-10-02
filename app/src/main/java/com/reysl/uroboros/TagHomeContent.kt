@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,17 +17,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.ItemCard
 
 @Composable
-fun TagHomeContent(tagViewModel: TagViewModel, navController: NavController) {
+fun TagHomeContent(tagViewModel: TagViewModel) {
     val tagList by tagViewModel.tagList.observeAsState(emptyList())
     if (tagList.isNotEmpty()) {
         var currentItem by remember {
@@ -71,17 +64,6 @@ fun TagHomeContent(tagViewModel: TagViewModel, navController: NavController) {
                 }
             }
         }
-    } else {
-//        Text(
-//            text = "Нет доступных меток",
-//            fontFamily = acherusFeral,
-//            fontSize = 16.sp,
-//            fontWeight = FontWeight.Light,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(10.dp),
-//            textAlign = TextAlign.Center
-//        )
     }
 
 }

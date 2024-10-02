@@ -1,6 +1,5 @@
 package com.reysl.uroboros.view
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,15 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,23 +22,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
-import com.reysl.uroboros.data.Note
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.scheduleReminder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +48,7 @@ fun NoteScreen(
     noteContent: String,
     noteTag: String,
 ) {
-
+    val annotatedContent = parseHtmlToAnnotatedString(noteContent)
 
     Scaffold(
         topBar = {
@@ -127,10 +117,23 @@ fun NoteScreen(
         ) {
             TagSection(tag = noteTag)
             Spacer(modifier = Modifier.height(10.dp))
-            TextContent(noteContent)
+            TextContent(annotatedContent)
         }
     }
 }
+
+@Composable
+fun TextContent(annotatedContent: AnnotatedString) {
+    Text(
+        text = annotatedContent,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        textAlign = TextAlign.Start,
+        fontFamily = acherusFeral,
+        fontWeight = FontWeight.Light
+    )
+}
+
 
 
 
@@ -156,17 +159,60 @@ fun TagSection(tag: String) {
     }
 }
 
-@Composable
-fun TextContent(noteContent: String) {
-    Text(
-        text = noteContent,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-        textAlign = TextAlign.Start,
-        fontFamily = acherusFeral,
-        fontWeight = FontWeight.Light
-    )
+
+fun parseHtmlToAnnotatedString(htmlContent: String): AnnotatedString {
+    val builder = AnnotatedString.Builder()
+    var currentIndex = 0
+
+    while (currentIndex < htmlContent.length) {
+        val boldStartIndex = htmlContent.indexOf("<b>", currentIndex)
+        val boldEndIndex = htmlContent.indexOf("</b>", currentIndex)
+
+        val italicStartIndex = htmlContent.indexOf("<i>", currentIndex)
+        val italicEndIndex = htmlContent.indexOf("</i>", currentIndex)
+
+        val nextTagIndex = listOfNotNull(
+            boldStartIndex.takeIf { it != -1 },
+            italicStartIndex.takeIf { it != -1 }
+        ).minOrNull()
+
+        if (nextTagIndex != null && nextTagIndex > currentIndex) {
+            builder.append(htmlContent.substring(currentIndex, nextTagIndex))
+            currentIndex = nextTagIndex
+        }
+
+        if (boldStartIndex != -1 && boldStartIndex == currentIndex) {
+            if (boldEndIndex != -1 && boldEndIndex > boldStartIndex) {
+                builder.withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    builder.append(htmlContent.substring(boldStartIndex + 3, boldEndIndex))
+                }
+                currentIndex = boldEndIndex + 4
+            } else {
+                throw IllegalArgumentException("Unmatched <b> tag")
+            }
+        }
+        else if (italicStartIndex != -1 && italicStartIndex == currentIndex) {
+            if (italicEndIndex != -1 && italicEndIndex > italicStartIndex) {
+                builder.withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                    builder.append(htmlContent.substring(italicStartIndex + 3, italicEndIndex))
+                }
+                currentIndex = italicEndIndex + 4
+            } else {
+                throw IllegalArgumentException("Unmatched <i> tag")
+            }
+        }
+    }
+
+    if (currentIndex < htmlContent.length) {
+        builder.append(htmlContent.substring(currentIndex))
+    }
+
+    return builder.toAnnotatedString()
 }
+
+
+
+
 
 
 

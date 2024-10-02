@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,12 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,20 +40,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.reysl.uroboros.AuthViewModel
-import com.reysl.uroboros.AuthViewModel.*
+import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.NoteHomeContent
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import com.reysl.uroboros.NoteSearchHomeContent
 import com.reysl.uroboros.R
 import com.reysl.uroboros.TagHomeContent
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.data.Tag
+import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 
 @Composable
-fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteViewModel: NoteViewModel, tagViewModel: TagViewModel) {
+fun HomePage(
+    authViewModel: AuthViewModel,
+    navController: NavController,
+    noteViewModel: NoteViewModel,
+    tagViewModel: TagViewModel
+) {
 
     val authState = authViewModel.authState.observeAsState()
-    
+
+    var isSearch by remember {
+        mutableStateOf(false)
+    }
+
+    var searchQuery by remember {
+        mutableStateOf("")
+    }
+
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
@@ -67,7 +79,7 @@ fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteVie
 
 
     Scaffold(
-        content = {innerPadding ->
+        content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -85,12 +97,31 @@ fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteVie
                         painter = painterResource(id = R.drawable.uroboros_logo),
                         contentDescription = "Logo"
                     )
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.search_icon),
-                            contentDescription = "Search",
-                            modifier = Modifier.size(35.dp)
+                    if (isSearch) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    isSearch = false
+                                    searchQuery = ""
+                                }) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.search_icon),
+                                        contentDescription = "Search",
+                                        modifier = Modifier.size(35.dp)
+                                    )
+                                }
+                            }
                         )
+                    } else {
+                        IconButton(onClick = { isSearch = true }) {
+                            Image(
+                                painter = painterResource(id = R.drawable.search_icon),
+                                contentDescription = "Search",
+                                modifier = Modifier.size(35.dp)
+                            )
+                        }
                     }
                 }
                 Text(
@@ -104,9 +135,23 @@ fun HomePage(authViewModel: AuthViewModel, navController: NavController, noteVie
                 Row(
                     modifier = Modifier.padding(start = 43.dp)
                 ) {
-                    TagHomeContent(tagViewModel = tagViewModel, navController)
+                    TagHomeContent(tagViewModel = tagViewModel)
                 }
-                NoteHomeContent(modifier = Modifier.padding(bottom = 60.dp), viewModel = NoteViewModel(), navController = navController)
+                if (searchQuery.isNotEmpty()) {
+                    NoteSearchHomeContent(
+                        modifier = Modifier.padding(bottom = 60.dp),
+                        viewModel = noteViewModel,
+                        navController = navController,
+                        query = searchQuery
+                    )
+                } else {
+                    NoteHomeContent(
+                        modifier = Modifier.padding(bottom = 60.dp),
+                        viewModel = noteViewModel,
+                        navController = navController
+                    )
+                }
+
             }
         }
     )
@@ -131,8 +176,7 @@ fun ItemCard(
                 BorderStroke(1.dp, colorResource(id = R.color.green)),
                 shape = RoundedCornerShape(10.dp)
             )
-            .clickable(onClick = onClick)
-        ,
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = if (isCurrent) colorResource(id = R.color.green) else Color.Transparent)
     ) {
         Box(
