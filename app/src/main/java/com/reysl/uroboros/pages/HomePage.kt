@@ -135,10 +135,11 @@ fun HomePage(
                 Row(
                     modifier = Modifier.padding(start = 43.dp)
                 ) {
-                    TagHomeContent(tagViewModel = tagViewModel, navController)
+                    TagHomeContent(tagViewModel = tagViewModel)
                 }
                 if (searchQuery.isNotEmpty()) {
                     NoteSearchHomeContent(
+                        modifier = Modifier.padding(bottom = 60.dp),
                         viewModel = noteViewModel,
                         navController = navController,
                         query = searchQuery
@@ -146,7 +147,7 @@ fun HomePage(
                 } else {
                     NoteHomeContent(
                         modifier = Modifier.padding(bottom = 60.dp),
-                        viewModel = NoteViewModel(),
+                        viewModel = noteViewModel,
                         navController = navController
                     )
                 }
