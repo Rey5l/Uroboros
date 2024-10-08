@@ -88,5 +88,9 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc09")
+
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
+
 
 }

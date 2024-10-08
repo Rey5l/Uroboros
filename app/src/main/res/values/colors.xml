@@ -16,4 +16,5 @@
     <color name="card_color">#A8E2B9</color>
     <color name="text_field_gray">#CBCCC0</color>
     <color name="error_red">#F76945</color>
+    <color name="rich_text_editor_background">#F3FBFE</color>
 </resources>
