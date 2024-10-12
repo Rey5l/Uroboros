@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.reysl.uroboros.Converters
 import com.reysl.uroboros.data.Note
 
-@Database(entities = [Note::class], version = 6)
+@Database(entities = [Note::class], version = 7)
 @TypeConverters(Converters::class)
 abstract class NoteDatabase: RoomDatabase() {
 

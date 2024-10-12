@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthViewModel.*
+import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.HomePage
@@ -108,7 +108,7 @@ fun MainScreen(modifier: Modifier = Modifier, navController: NavController, auth
 @Composable
 fun ContentScreen(modifier: Modifier, index: Int, navController: NavController, authViewModel: AuthViewModel) {
     when (index) {
-        0 -> NotesPage(authViewModel, navController, noteViewModel = NoteViewModel(), tagViewModel = TagViewModel())
+        0 -> NotesPage(noteViewModel = NoteViewModel())
         1 -> HomePage(authViewModel, navController, noteViewModel = NoteViewModel(), tagViewModel = TagViewModel())
         2 -> ProfilePage(authViewModel, navController)
     }

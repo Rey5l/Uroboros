@@ -48,10 +48,7 @@ fun AppNavigation(
         composable("notes") {
             showBottomBar.value = true
             NotesPage(
-                authViewModel,
-                navController,
                 noteViewModel = NoteViewModel(),
-                tagViewModel = TagViewModel()
             )
         }
         composable("home") {
@@ -65,7 +62,7 @@ fun AppNavigation(
         }
         composable("note_screen/{noteId}/{title}/{content}/{tag}") { backStackEntry ->
             showBottomBar.value = false
-            val noteId = backStackEntry.arguments?.getString("noteId") ?: -1L
+            val noteId = backStackEntry.arguments?.getString("noteId")?.toLongOrNull() ?: -1L
             val noteTitle = Uri.decode(backStackEntry.arguments?.getString("title")) ?: "UnknownTitle"
             val noteContent =
                 Uri.decode(backStackEntry.arguments?.getString("content")) ?: "No content available"
@@ -73,6 +70,8 @@ fun AppNavigation(
             if (noteId != -1L) {
                 NoteScreen(
                     navController = navController,
+                    noteViewModel = NoteViewModel(),
+                    noteId = noteId,
                     noteTitle = noteTitle,
                     noteContent = noteContent,
                     noteTag,
