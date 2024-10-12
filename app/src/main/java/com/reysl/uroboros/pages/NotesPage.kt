@@ -1,7 +1,6 @@
 package com.reysl.uroboros.pages
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,19 +19,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
+import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
 import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.FormatAlignCenter
-import androidx.compose.material.icons.filled.FormatAlignLeft
-import androidx.compose.material.icons.filled.FormatAlignRight
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatColorText
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,25 +64,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import com.reysl.uroboros.AddMaterialDialog
-import com.reysl.uroboros.AuthViewModel
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.data.db.tag_db.TagViewModel
+import com.reysl.uroboros.formatTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesPage(
-    authViewModel: AuthViewModel,
-    navController: NavController,
-    noteViewModel: NoteViewModel,
-    tagViewModel: TagViewModel
+    noteViewModel: NoteViewModel
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
@@ -143,19 +138,19 @@ fun NotesPage(
                         .padding(end = 20.dp, bottom = 20.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
-//                    Card(
-//                        shape = RoundedCornerShape(8.dp),
-//                        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.light_green)),
-//                    ) {
-//                        Text(
-//                            text = formatTime(java.util.Date()),
-//                            fontFamily = acherusFeral,
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 16.sp,
-//                            color = colorResource(id = R.color.green),
-//                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp)
-//                        )
-//                    } // card with time
+                    Card(
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.light_green)),
+                    ) {
+                        Text(
+                            text = formatTime(java.util.Date()),
+                            fontFamily = acherusFeral,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = colorResource(id = R.color.green),
+                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp)
+                        )
+                    }
                 }
             }
         }
@@ -230,9 +225,6 @@ fun TextEditor(
                 onCenterAlignClick = {
                     state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
                 },
-                onExportClick = {
-                    Log.d("Editor", state.toHtml())
-                }
             )
             RichTextEditor(
                 colors = RichTextEditorDefaults.richTextEditorColors(containerColor = colorResource(R.color.rich_text_editor_background)),
@@ -264,7 +256,6 @@ fun EditorControls(
     onStartAlignClick: () -> Unit,
     onEndAlignClick: () -> Unit,
     onCenterAlignClick: () -> Unit,
-    onExportClick: () -> Unit,
 ) {
     var boldSelected by rememberSaveable { mutableStateOf(false) }
     var italicSelected by rememberSaveable { mutableStateOf(false) }
@@ -439,7 +430,7 @@ fun EditorControls(
             onClick = onStartAlignClick
         ) {
             Icon(
-                imageVector = Icons.Default.FormatAlignLeft,
+                imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
                 contentDescription = "Start Align Control",
                 tint = MaterialTheme.colorScheme.onPrimary
             )
@@ -461,20 +452,8 @@ fun EditorControls(
             onClick = onEndAlignClick
         ) {
             Icon(
-                imageVector = Icons.Default.FormatAlignRight,
+                imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
                 contentDescription = "End Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = true,
-            selectedColor = MaterialTheme.colorScheme.tertiary,
-            onChangeClick = { },
-            onClick = onExportClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.Save,
-                contentDescription = "Export Control",
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }

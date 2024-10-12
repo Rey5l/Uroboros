@@ -1,7 +1,6 @@
 package com.reysl.uroboros.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,16 +20,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
+import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
 import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.FormatAlignCenter
-import androidx.compose.material.icons.filled.FormatAlignLeft
-import androidx.compose.material.icons.filled.FormatAlignRight
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatColorText
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -39,17 +37,20 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -69,22 +70,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
+import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteScreen(
     navController: NavController,
+    noteViewModel: NoteViewModel,
+    noteId: Long,
     noteTitle: String,
     noteContent: String,
     noteTag: String,
 ) {
-    val state = rememberRichTextState()
-    var showTextStyleDialog by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val state = remember { RichTextState().apply { setHtml(noteContent) } }
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -119,7 +126,7 @@ fun NoteScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     FloatingActionButton(
-                        onClick = { showTextStyleDialog = true },
+                        onClick = { showBottomSheet = true },
                         containerColor = colorResource(id = R.color.green),
                         contentColor = colorResource(id = R.color.white)
                     ) {
@@ -131,7 +138,12 @@ fun NoteScreen(
                     }
 
                     FloatingActionButton(
-                        onClick = { /* Handle right action */ },
+                        onClick = {
+                            val updatedContent = state.toHtml()
+                            coroutineScope.launch {
+                                noteViewModel.noteDao.updateNoteContent(id = noteId, updatedContent)
+                            }
+                        },
                         containerColor = colorResource(id = R.color.green),
                         contentColor = colorResource(id = R.color.white)
                     ) {
@@ -153,46 +165,44 @@ fun NoteScreen(
         ) {
             TagSection(tag = noteTag)
             Spacer(modifier = Modifier.height(10.dp))
-            TextEditor(state.setHtml(noteContent))
+            TextEditor(state)
 
-            if (showTextStyleDialog) {
-                TextStyleDialog(state) {
-                    showTextStyleDialog = false
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState
+                ) {
+                    Column {
+                        EditorControls(
+                            state = state,
+                            onBoldClick = { state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) },
+                            onItalicClick = { state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) },
+                            onUnderlineClick = { state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline)) },
+                            onTitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 24.sp)) },
+                            onSubtitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 20.sp)) },
+                            onTextColorClick = { state.toggleSpanStyle(SpanStyle(color = Color.Red)) },
+                            onStartAlignClick = {
+                                state.toggleParagraphStyle(
+                                    ParagraphStyle(
+                                        textAlign = TextAlign.Start
+                                    )
+                                )
+                            },
+                            onEndAlignClick = { state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End)) },
+                            onCenterAlignClick = {
+                                state.toggleParagraphStyle(
+                                    ParagraphStyle(
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
     }
 }
-
-@Composable
-fun TextStyleDialog(state: RichTextState, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close")
-            }
-        },
-        text = {
-            Column {
-                EditorControls(
-                    state = state,
-                    onBoldClick = { state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) },
-                    onItalicClick = { state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) },
-                    onUnderlineClick = { state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline)) },
-                    onTitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 24.sp)) },
-                    onSubtitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 20.sp)) },
-                    onTextColorClick = { state.toggleSpanStyle(SpanStyle(color = Color.Red)) },
-                    onStartAlignClick = { state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start)) },
-                    onEndAlignClick = { state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End)) },
-                    onCenterAlignClick = { state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center)) },
-                    onExportClick = { Log.d("Editor", state.toHtml()) }
-                )
-            }
-        }
-    )
-}
-
 
 @Composable
 fun TagSection(tag: String) {
@@ -222,16 +232,10 @@ fun TagSection(tag: String) {
 fun TextEditor(
     state: RichTextState
 ) {
-    val titleSize = MaterialTheme.typography.titleLarge.fontSize
-    val subtitleSize = MaterialTheme.typography.titleLarge.fontSize
-
     Scaffold {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(all = 20.dp)
-                .padding(bottom = it.calculateBottomPadding())
-                .padding(top = it.calculateTopPadding()),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -239,11 +243,14 @@ fun TextEditor(
                 colors = RichTextEditorDefaults.richTextEditorColors(
                     containerColor = colorResource(
                         R.color.rich_text_editor_background
-                    )
+                    ),
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(8f),
+                    .weight(8f)
+                    .background(color = Color.Transparent),
                 state = state,
                 textStyle = TextStyle(
                     fontFamily = acherusFeral,
@@ -269,7 +276,7 @@ fun EditorControls(
     onStartAlignClick: () -> Unit,
     onEndAlignClick: () -> Unit,
     onCenterAlignClick: () -> Unit,
-    onExportClick: () -> Unit,
+//    onExportClick: () -> Unit,
 ) {
     var boldSelected by rememberSaveable { mutableStateOf(false) }
     var italicSelected by rememberSaveable { mutableStateOf(false) }
@@ -444,7 +451,7 @@ fun EditorControls(
             onClick = onStartAlignClick
         ) {
             Icon(
-                imageVector = Icons.Default.FormatAlignLeft,
+                imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
                 contentDescription = "Start Align Control",
                 tint = MaterialTheme.colorScheme.onPrimary
             )
@@ -466,20 +473,8 @@ fun EditorControls(
             onClick = onEndAlignClick
         ) {
             Icon(
-                imageVector = Icons.Default.FormatAlignRight,
+                imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
                 contentDescription = "End Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = true,
-            selectedColor = MaterialTheme.colorScheme.tertiary,
-            onChangeClick = { },
-            onClick = onExportClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.Save,
-                contentDescription = "Export Control",
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }

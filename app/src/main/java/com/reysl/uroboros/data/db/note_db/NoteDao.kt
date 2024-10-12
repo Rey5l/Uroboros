@@ -22,7 +22,10 @@ interface NoteDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateNote(note: Note)
 
-    @Query("Select Count(*) From Note Where tag = :tag")
+    @Query("UPDATE Note SET styledText = :newContent WHERE id = :id")
+    suspend fun updateNoteContent(id: Long, newContent: String)
+
+    @Query("SELECT Count(*) FROM Note WHERE tag = :tag")
     suspend fun getNotesCountByTag(tag: String): Int
 
     @Query("SELECT * FROM Note WHERE title LIKE '%' || :title || '%'")
