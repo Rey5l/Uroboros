@@ -77,4 +77,8 @@ class NoteViewModel : ViewModel() {
         }
     }
 
+    fun filterNotesByTag(tag: String): LiveData<List<Note>> {
+        return noteDao.getNotesByTag(tag)
+    }
+
 }

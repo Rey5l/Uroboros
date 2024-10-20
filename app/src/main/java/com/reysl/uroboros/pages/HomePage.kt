@@ -43,6 +43,7 @@ import com.reysl.uroboros.AuthViewModel
 import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.NoteHomeContent
 import com.reysl.uroboros.NoteSearchHomeContent
+import com.reysl.uroboros.NoteTagSearchHomeContent
 import com.reysl.uroboros.R
 import com.reysl.uroboros.TagHomeContent
 import com.reysl.uroboros.acherusFeral
@@ -66,6 +67,10 @@ fun HomePage(
 
     var searchQuery by remember {
         mutableStateOf("")
+    }
+
+    var tagName by remember {
+        mutableStateOf<Tag?>(null)
     }
 
 
@@ -135,7 +140,11 @@ fun HomePage(
                 Row(
                     modifier = Modifier.padding(start = 43.dp)
                 ) {
-                    TagHomeContent(tagViewModel = tagViewModel)
+                    TagHomeContent(
+                        tagViewModel = tagViewModel,
+                    ) { selectedTag ->
+                        tagName = selectedTag
+                    }
                 }
                 if (searchQuery.isNotEmpty()) {
                     NoteSearchHomeContent(
@@ -143,6 +152,12 @@ fun HomePage(
                         viewModel = noteViewModel,
                         navController = navController,
                         query = searchQuery
+                    )
+                } else if (tagName != null) {
+                    NoteTagSearchHomeContent(
+                        viewModel = noteViewModel,
+                        navController = navController,
+                        tag = tagName!!
                     )
                 } else {
                     NoteHomeContent(
@@ -163,11 +178,10 @@ fun HomePage(
 @Composable
 fun ItemCard(
     item: Tag,
-    currentItem: Tag,
-    onClick: () -> Unit
+    currentItem: Tag?,
+    onClick: (Tag) -> Unit
 ) {
     val isCurrent = item == currentItem
-
 
     Card(
         modifier = Modifier
@@ -176,7 +190,7 @@ fun ItemCard(
                 BorderStroke(1.dp, colorResource(id = R.color.green)),
                 shape = RoundedCornerShape(10.dp)
             )
-            .clickable(onClick = onClick),
+            .clickable { onClick(item) },
         colors = CardDefaults.cardColors(containerColor = if (isCurrent) colorResource(id = R.color.green) else Color.Transparent)
     ) {
         Box(

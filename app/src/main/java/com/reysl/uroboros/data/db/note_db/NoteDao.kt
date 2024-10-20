@@ -31,6 +31,6 @@ interface NoteDao {
     @Query("SELECT * FROM Note WHERE title LIKE '%' || :title || '%'")
     fun searchNotesByTitle(title: String): LiveData<List<Note>>
 
-
-
+    @Query("SELECT * FROM Note WHERE tag = :tag")
+    fun getNotesByTag(tag: String): LiveData<List<Note>>
 }

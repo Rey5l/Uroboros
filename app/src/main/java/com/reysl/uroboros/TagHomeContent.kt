@@ -18,15 +18,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.reysl.uroboros.data.Tag
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.ItemCard
 
 @Composable
-fun TagHomeContent(tagViewModel: TagViewModel) {
+fun TagHomeContent(
+    tagViewModel: TagViewModel,
+    onTagSelected: (Tag?) -> Unit
+) {
     val tagList by tagViewModel.tagList.observeAsState(emptyList())
     if (tagList.isNotEmpty()) {
         var currentItem by remember {
-            mutableStateOf(tagList[0])
+            mutableStateOf<Tag?>(null)
         }
         var isFilled by remember {
             mutableStateOf(false)
@@ -44,7 +48,7 @@ fun TagHomeContent(tagViewModel: TagViewModel) {
             } else {
                 Image(
                     painter = painterResource(id = R.drawable.star),
-                    contentDescription = "Favourite",
+                    contentDescription = "Unfavourite",
                     modifier = Modifier
                         .size(30.dp)
                 )
@@ -59,11 +63,20 @@ fun TagHomeContent(tagViewModel: TagViewModel) {
             contentPadding = PaddingValues(horizontal = 5.dp)
         ) {
             items(tagList) { item ->
-                ItemCard(item, currentItem) {
-                    currentItem = item
+                ItemCard(
+                    item, currentItem
+                ) {
+                    if (currentItem == item) {
+                        currentItem = null
+                        onTagSelected(null)
+                    } else {
+                        currentItem = item
+                        onTagSelected(item)
+                    }
                 }
             }
         }
+
     }
 
 }
