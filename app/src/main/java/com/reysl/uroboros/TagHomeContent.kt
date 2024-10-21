@@ -25,7 +25,8 @@ import com.reysl.uroboros.pages.ItemCard
 @Composable
 fun TagHomeContent(
     tagViewModel: TagViewModel,
-    onTagSelected: (Tag?) -> Unit
+    onTagSelected: (Tag?) -> Unit,
+    onFavouriteSelected: (Boolean) -> Unit
 ) {
     val tagList by tagViewModel.tagList.observeAsState(emptyList())
     if (tagList.isNotEmpty()) {
@@ -37,6 +38,7 @@ fun TagHomeContent(
         }
         IconButton(onClick = {
             isFilled = !isFilled
+            onFavouriteSelected(isFilled)
         }) {
             if (isFilled) {
                 Image(
@@ -66,9 +68,10 @@ fun TagHomeContent(
                 ItemCard(
                     item, currentItem
                 ) {
-                    if (currentItem == item) {
+                    if (currentItem == item || isFilled) {
                         currentItem = null
                         onTagSelected(null)
+
                     } else {
                         currentItem = item
                         onTagSelected(item)

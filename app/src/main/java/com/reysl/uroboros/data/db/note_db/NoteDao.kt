@@ -33,4 +33,7 @@ interface NoteDao {
 
     @Query("SELECT * FROM Note WHERE tag = :tag")
     fun getNotesByTag(tag: String): LiveData<List<Note>>
+
+    @Query("SELECT * FROM Note WHERE isFavourite = :isFavourite")
+    fun getFavouriteNotes(isFavourite: Boolean): LiveData<List<Note>>
 }
