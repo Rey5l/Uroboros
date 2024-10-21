@@ -1,4 +1,5 @@
 package com.reysl.uroboros
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,18 +10,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.reysl.uroboros.data.Tag
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 
 @Composable
-fun NoteTagSearchHomeContent(
+fun NoteFavouriteHomeContent(
     modifier: Modifier,
-    viewModel: NoteViewModel,
+    noteViewModel: NoteViewModel,
     navController: NavController,
-    tag: Tag
+    isFavourite: Boolean
 ) {
-    val notes by viewModel.filterNotesByTag(tag.tag).observeAsState(listOf())
-
+    val notes by noteViewModel.getFavouriteMaterials(isFavourite).observeAsState(listOf())
     LazyColumn(
         contentPadding = PaddingValues(
             horizontal = 16.dp,
@@ -32,9 +31,8 @@ fun NoteTagSearchHomeContent(
         items(
             items = notes,
             itemContent = {
-                NoteListItem(note = it, viewModel = viewModel, navController)
+                NoteListItem(note = it, viewModel = noteViewModel, navController)
             }
         )
     }
-
 }

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.reysl.uroboros.AuthViewModel
 import com.reysl.uroboros.AuthViewModel.AuthState
+import com.reysl.uroboros.NoteFavouriteHomeContent
 import com.reysl.uroboros.NoteHomeContent
 import com.reysl.uroboros.NoteSearchHomeContent
 import com.reysl.uroboros.NoteTagSearchHomeContent
@@ -71,6 +72,10 @@ fun HomePage(
 
     var tagName by remember {
         mutableStateOf<Tag?>(null)
+    }
+
+    var isFavouriteMaterial by remember {
+        mutableStateOf<Boolean?>(null)
     }
 
 
@@ -142,9 +147,12 @@ fun HomePage(
                 ) {
                     TagHomeContent(
                         tagViewModel = tagViewModel,
-                    ) { selectedTag ->
-                        tagName = selectedTag
-                    }
+                        onTagSelected = { selectedTag ->
+                            tagName = selectedTag
+                        },
+                        onFavouriteSelected = { isFavourite ->
+                            isFavouriteMaterial = if (isFavourite) true else null
+                        })
                 }
                 if (searchQuery.isNotEmpty()) {
                     NoteSearchHomeContent(
@@ -155,9 +163,17 @@ fun HomePage(
                     )
                 } else if (tagName != null) {
                     NoteTagSearchHomeContent(
+                        modifier = Modifier.padding(bottom = 60.dp),
                         viewModel = noteViewModel,
                         navController = navController,
                         tag = tagName!!
+                    )
+                } else if (isFavouriteMaterial != null) {
+                    NoteFavouriteHomeContent(
+                        modifier = Modifier.padding(bottom = 60.dp),
+                        noteViewModel = noteViewModel,
+                        navController = navController,
+                        isFavourite = isFavouriteMaterial!!
                     )
                 } else {
                     NoteHomeContent(

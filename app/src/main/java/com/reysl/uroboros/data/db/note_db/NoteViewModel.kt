@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reysl.uroboros.MainApplication
+import com.reysl.uroboros.NoteRepository
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.Tag
 import com.reysl.uroboros.scheduleReminder
@@ -16,9 +17,16 @@ import java.time.Instant
 import java.util.Date
 
 class NoteViewModel : ViewModel() {
+    private val repository: NoteRepository
     val noteDao = MainApplication.noteDatabase.getNoteDao()
     val tagDao = MainApplication.tagDatabase.getTagDao()
-    val noteList: LiveData<List<Note>> = noteDao.getAllNote()
+    val noteList: LiveData<List<Note>>
+
+    init {
+        val noteDao = noteDao
+        repository = NoteRepository(noteDao)
+        noteList = repository.getAllNotes()
+    }
 
     fun addNote(title: String, description: String, tag: String, markdownText: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -79,6 +87,21 @@ class NoteViewModel : ViewModel() {
 
     fun filterNotesByTag(tag: String): LiveData<List<Note>> {
         return noteDao.getNotesByTag(tag)
+    }
+
+    fun toggleFavourite(note: Note) {
+        val updatedNote = note.copy(isFavourite = !note.isFavourite)
+        updateNoteInDatabase(updatedNote)
+    }
+
+    private fun updateNoteInDatabase(note: Note) {
+        viewModelScope.launch {
+            repository.update(note)
+        }
+    }
+
+    fun getFavouriteMaterials(isFavourite: Boolean): LiveData<List<Note>> {
+        return repository.getFavouriteMaterials(isFavourite)
     }
 
 }

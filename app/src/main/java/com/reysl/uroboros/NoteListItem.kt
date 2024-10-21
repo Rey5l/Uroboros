@@ -44,10 +44,6 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
 
     val context = LocalContext.current
 
-    var isFilledStar by remember {
-        mutableStateOf(false)
-    }
-
     var showDeleteConfirmationDialog by remember {
         mutableStateOf(false)
     }
@@ -106,8 +102,11 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                             showDeleteConfirmationDialog = false
                         })
                     }
-                    IconButton(onClick = { isFilledStar = !isFilledStar }) {
-                        if (isFilledStar) {
+                    IconButton(
+                        onClick = {
+                            viewModel.toggleFavourite(note)
+                        }) {
+                        if (note.isFavourite) {
                             Icon(
                                 painter = painterResource(id = R.drawable.star_filled),
                                 tint = colorResource(id = R.color.green),
