@@ -88,9 +88,14 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    // Rich Text Editor
+
     implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc09")
 
     implementation("androidx.compose.material:material-icons-extended:1.5.3")
 
+    // Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc02")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc02")
 
 }

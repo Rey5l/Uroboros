@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -48,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -104,24 +107,39 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         mutableStateOf<String?>(null)
     }
 
-    var avatarUri by remember { mutableStateOf<Uri?>(null) }
-
-    var imagePickerLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            avatarUri = uri
-        }
+    var isLoadingImage by remember { mutableStateOf(false) }
+    var isLoadingInitial by remember { mutableStateOf(true) }
 
     val currentUser = FirebaseAuth.getInstance().currentUser
-    
+    var avatarUri by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                avatarUri = uri
+                uploadImageToFirebase(uri, context) { downloadUri ->
+                    avatarUri = downloadUri
+                    isLoadingImage = false
+                }
+            }
+            isLoadingImage = true
+        }
+
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
-            val userRef = FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
+            val userRef =
+                FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
             userRef.get().addOnSuccessListener { document ->
                 if (document != null && document.contains("avatarUrl")) {
                     val avatarUrl = document.getString("avatarUrl")
                     avatarUri = Uri.parse(avatarUrl)
                 }
+                isLoadingInitial = false
+            }.addOnFailureListener {
+                isLoadingInitial = false
             }
+        } else {
+            isLoadingInitial = false
         }
     }
 
@@ -131,7 +149,6 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             is AuthState.Success -> {
                 showSuccessDialog = true
             }
-
 
             is AuthState.Error -> {
                 showErrorDialog = (authState.value as AuthState.Error).message
@@ -175,33 +192,40 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier.size(120.dp)
-            ) {
+            if (isLoadingInitial) {
+                CircularProgressIndicator(modifier = Modifier.size(120.dp))
+            } else {
                 Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(Color.Gray)
-                        .border(2.dp, colorResource(id = R.color.green), CircleShape),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier.size(120.dp)
                 ) {
-                    ProfileImage(imageUrl = avatarUri)
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                            .border(2.dp, colorResource(id = R.color.green), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ProfileImage(imageUrl = avatarUri)
+                    }
+                    IconButton(
+                        onClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(Color.White, CircleShape)
+                            .border(1.dp, Color.Gray, CircleShape)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.camera),
+                            contentDescription = "Edit",
+                            tint = Color.Black,
+                        )
+                    }
                 }
-                IconButton(
-                    onClick = { imagePickerLauncher.launch("image/*") },
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(Color.White, CircleShape)
-                        .border(1.dp, Color.Gray, CircleShape)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.camera),
-                        contentDescription = "Edit",
-                        tint = Color.Black,
-                    )
-                }
+            }
+            if (isLoadingImage) {
+                CircularProgressIndicator(modifier = Modifier.size(120.dp))
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -452,21 +476,20 @@ fun SignoutConfirmationDialog(
 
 @Composable
 fun ProfileImage(imageUrl: Uri?) {
-    if (imageUrl != null) {
-        Image(
-            painter = rememberAsyncImagePainter(imageUrl),
-            contentDescription = "Profile Image",
-            modifier = Modifier.size(100.dp),
-            contentScale = ContentScale.Crop
-        )
-    } else {
-        Image(
-            painter = painterResource(id = R.drawable.avatar),
-            contentDescription = "Profile Image",
-            modifier = Modifier.size(100.dp),
-            contentScale = ContentScale.Crop
-        )
-    }
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .crossfade(true)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .build()
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = "Profile Image",
+        modifier = Modifier.size(100.dp),
+        contentScale = ContentScale.Crop
+    )
 }
 
 
@@ -479,6 +502,7 @@ fun uploadImageToFirebase(uri: Uri?, context: Context, onImageUpload: (Uri) -> U
     uploadTask.addOnSuccessListener {
         imageReference.downloadUrl.addOnSuccessListener { downloadUri ->
             onImageUpload(downloadUri)
+            saveAvatarUrlToDatabase(downloadUri.toString())
             Toast.makeText(context, "Фото профиля успешно изменено", Toast.LENGTH_SHORT).show()
         }
     }.addOnFailureListener {

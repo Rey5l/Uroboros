@@ -99,7 +99,7 @@ fun HomePage(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 30.dp, start = 30.dp, end = 30.dp),
+                        .padding(start = 30.dp, end = 30.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
