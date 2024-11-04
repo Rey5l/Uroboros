@@ -1,5 +1,6 @@
 package com.reysl.uroboros
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,8 +21,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,11 +35,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthViewModel.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.reysl.uroboros.AuthViewModel.AuthState
 
 @Composable
 fun Registration(navController: NavController, authViewModel: AuthViewModel) {
@@ -49,8 +57,11 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
         mutableStateOf("")
     }
 
+    var isPasswordShow by remember { mutableStateOf(false) }
+
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
@@ -60,6 +71,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                 (authState.value as AuthState.Error).message,
                 Toast.LENGTH_SHORT
             ).show()
+
             else -> Unit
         }
     }
@@ -158,9 +170,24 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             label = {
                 Text(text = "Введите пароль")
             },
+            trailingIcon = {
+                IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
+                    if (isPasswordShow) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close_eye),
+                            contentDescription = "show"
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.eye),
+                            contentDescription = "don't show"
+                        )
+                    }
+                }
+            },
+            visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .padding(start = 50.dp),
-            visualTransformation = PasswordVisualTransformation()
         )
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -187,5 +214,25 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             }
         }
 
+        if (username.isNotEmpty() && currentUser != null) {
+            saveUsernameToFirebase(username)
+        }
+
     }
+}
+
+fun saveUsernameToFirebase(username: String) {
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    val userRef = db.collection("users").document(currentUser!!.uid)
+    val userData = hashMapOf("username" to username)
+
+    userRef.set(userData, SetOptions.merge())
+        .addOnSuccessListener {
+            Log.d("FirebaseFirestore", "Имя успешно добавлено в базу данных")
+        }
+        .addOnFailureListener { e ->
+            Log.e("FirebaseFirestoreError", "Не получилось добавить имя в базу данных", e)
+        }
 }

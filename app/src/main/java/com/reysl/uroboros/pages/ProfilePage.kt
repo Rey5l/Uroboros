@@ -54,11 +54,13 @@ import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.reysl.uroboros.AuthViewModel
 import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
+import com.reysl.uroboros.saveUsernameToFirebase
 
 
 @Composable
@@ -70,6 +72,8 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
     var name by remember {
         mutableStateOf("user_001")
     }
+
+    var initialName by remember { mutableStateOf("user_001") }
 
     var oldPassword by remember {
         mutableStateOf("")
@@ -133,6 +137,13 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 if (document != null && document.contains("avatarUrl")) {
                     val avatarUrl = document.getString("avatarUrl")
                     avatarUri = Uri.parse(avatarUrl)
+                }
+                if (document != null && document.contains("username")) {
+                    val username = document.getString("username")
+                    username?.let {
+                        name = it
+                        initialName = it
+                    }
                 }
                 isLoadingInitial = false
             }.addOnFailureListener {
@@ -333,6 +344,9 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     if (newPassword.isNotEmpty() && oldPassword.isNotEmpty()) {
                         authViewModel.changePassword(oldPassword, newPassword)
                     }
+                    if (initialName != name) {
+                        saveUsernameToFirebase(name)
+                    }
                     if (avatarUri != null) {
                         avatarUri.let { uri ->
                             uploadImageToFirebase(uri, context) { downloadUri ->
@@ -340,12 +354,6 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                                 saveAvatarUrlToDatabase(uri.toString())
                             }
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Пожалуйста, выберите изображение!",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }, colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(
@@ -523,7 +531,7 @@ fun saveAvatarUrlToDatabase(avatarUrl: String) {
             "updatedAt" to FieldValue.serverTimestamp()
         )
 
-        userRef.set(userData)
+        userRef.set(userData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("Firestore", "Avatar URL updated successfully.")
             }
