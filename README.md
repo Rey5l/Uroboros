@@ -26,4 +26,5 @@
 
 ## Связь
 Если у вас есть вопросы или предложения, пишите на [rey5l@yandex.ru](mailto:rey5l@yandex.ru).
+Также можете подписаться на мой телеграм канал [Reysl Dev Blog](https://t.me/reysldevblog)
 
