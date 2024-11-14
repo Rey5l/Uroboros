@@ -1,5 +1,6 @@
 package com.reysl.uroboros
 
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.ui.theme.UroborosTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
         }
     }
-    
+
     private fun handleIntent(intent: Intent?): String {
         return if (intent?.action == "OPEN_NOTE") {
             val noteId = intent.getLongExtra("note_id", -1L)

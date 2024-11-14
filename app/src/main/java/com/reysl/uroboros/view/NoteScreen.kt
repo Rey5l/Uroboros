@@ -1,11 +1,13 @@
 package com.reysl.uroboros.view
 
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
@@ -39,6 +42,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -206,23 +210,29 @@ fun NoteScreen(
 
 @Composable
 fun TagSection(tag: String) {
-    Row(
-        modifier = Modifier
-            .background(Color.Transparent)
-            .border(
-                BorderStroke(1.dp, colorResource(id = R.color.green)),
-                shape = RoundedCornerShape(8.dp)
+
+    val isDark = isSystemInDarkTheme()
+    val color = if (isDark) R.color.card_color else R.color.green
+
+    UroborosTheme {
+        Row(
+            modifier = Modifier
+                .background(Color.Transparent)
+                .border(
+                    BorderStroke(1.dp, colorResource(id = color)),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = tag,
+                color = colorResource(id = color),
+                fontWeight = FontWeight.Bold,
+                fontFamily = acherusFeral
             )
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = tag,
-            color = colorResource(id = R.color.green),
-            fontWeight = FontWeight.Bold,
-            fontFamily = acherusFeral
-        )
+        }
     }
 }
 
@@ -232,34 +242,39 @@ fun TagSection(tag: String) {
 fun TextEditor(
     state: RichTextState
 ) {
-    Scaffold {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            RichTextEditor(
-                colors = RichTextEditorDefaults.richTextEditorColors(
-                    containerColor = colorResource(
-                        R.color.rich_text_editor_background
-                    ),
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent
-                ),
+    UroborosTheme {
+        Scaffold {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(8f)
-                    .background(color = Color.Transparent),
-                state = state,
-                textStyle = TextStyle(
-                    fontFamily = acherusFeral,
-                    fontSize = 16.sp
-                ),
-            )
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val isDark = isSystemInDarkTheme()
+                RichTextEditor(
+                    colors = RichTextEditorDefaults.richTextEditorColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        cursorColor = colorResource(R.color.green),
+                        selectionColors = TextSelectionColors(
+                            handleColor = colorResource(R.color.green),
+                            backgroundColor = colorResource(if (isDark) R.color.green else R.color.card_color)
+                        )
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(8f)
+                        .background(color = Color.Transparent),
+                    state = state,
+                    textStyle = TextStyle(
+                        fontFamily = acherusFeral,
+                        fontSize = 16.sp
+                    ),
+                )
+            }
         }
     }
-
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -346,12 +361,36 @@ fun EditorControls(
                     OutlinedTextField(
                         value = linkText,
                         onValueChange = { linkText = it },
-                        label = { Text("Text to display", fontFamily = acherusFeral) }
+                        label = {
+                            Text(
+                                "Текст для отображения",
+                                fontFamily = acherusFeral,
+                                color = Color.Black
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(R.color.green),
+                            unfocusedBorderColor = Color.Gray,
+                            disabledBorderColor = Color.Gray,
+                            cursorColor = Color.Black
+                        ),
+                        textStyle = TextStyle(
+                            color = Color.Black
+                        )
                     )
                     OutlinedTextField(
                         value = link,
                         onValueChange = { link = it },
-                        label = { Text("Link URL", fontFamily = acherusFeral) }
+                        label = { Text("Ссылка", fontFamily = acherusFeral, color = Color.Black) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(R.color.green),
+                            unfocusedBorderColor = Color.Gray,
+                            disabledBorderColor = Color.Gray,
+                            cursorColor = Color.Black
+                        ),
+                        textStyle = TextStyle(
+                            color = Color.Black
+                        )
                     )
                 }
             },
@@ -376,7 +415,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatBold,
                 contentDescription = "Bold Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -387,7 +426,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatItalic,
                 contentDescription = "Italic Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -398,7 +437,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatUnderlined,
                 contentDescription = "Underline Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -409,7 +448,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.Title,
                 contentDescription = "Title Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -420,7 +459,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatSize,
                 contentDescription = "Subtitle Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -431,7 +470,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatColorText,
                 contentDescription = "Text Color Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -442,7 +481,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.AddLink,
                 contentDescription = "Link Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -453,7 +492,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
                 contentDescription = "Start Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -464,7 +503,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatAlignCenter,
                 contentDescription = "Center Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
         ControlWrapper(
@@ -475,7 +514,7 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
                 contentDescription = "End Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color.White
             )
         }
     }
@@ -503,7 +542,7 @@ fun ControlWrapper(
             )
             .border(
                 width = 1.dp,
-                color = colorResource(R.color.white),
+                color = colorResource(R.color.green),
                 shape = RoundedCornerShape(size = 6.dp)
             )
             .padding(all = 8.dp),

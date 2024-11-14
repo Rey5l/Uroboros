@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +54,7 @@ import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.data.Tag
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.data.db.tag_db.TagViewModel
+import com.reysl.uroboros.ui.theme.UroborosTheme
 
 @Composable
 fun HomePage(
@@ -87,107 +91,127 @@ fun HomePage(
     }
 
 
-
-    Scaffold(
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorResource(id = R.color.background))
-                    .padding(innerPadding),
-            ) {
-                Row(
+    UroborosTheme {
+        Scaffold(
+            content = { innerPadding ->
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 30.dp, end = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(innerPadding),
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.uroboros_logo),
-                        contentDescription = "Logo"
-                    )
-                    if (isSearch) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            trailingIcon = {
-                                IconButton(onClick = {
-                                    isSearch = false
-                                    searchQuery = ""
-                                }) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.search_icon),
-                                        contentDescription = "Search",
-                                        modifier = Modifier.size(35.dp)
-                                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 30.dp, end = 30.dp, top = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ThemedLogo()
+                        if (isSearch) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                trailingIcon = {
+                                    IconButton(onClick = {
+                                        isSearch = false
+                                        searchQuery = ""
+                                    }) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.search_icon),
+                                            contentDescription = "Search",
+                                            modifier = Modifier.size(35.dp),
+                                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                                        )
+                                    }
                                 }
-                            }
-                        )
-                    } else {
-                        IconButton(onClick = { isSearch = true }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.search_icon),
-                                contentDescription = "Search",
-                                modifier = Modifier.size(35.dp)
                             )
+                        } else {
+                            IconButton(onClick = { isSearch = true }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.search_icon),
+                                    contentDescription = "Search",
+                                    modifier = Modifier
+                                        .size(35.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                                )
+                            }
                         }
                     }
-                }
-                Text(
-                    text = "Метки",
-                    modifier = Modifier.padding(start = 43.dp),
-                    fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
-                )
-                Spacer(modifier = Modifier.height(7.dp))
-                Row(
-                    modifier = Modifier.padding(start = 43.dp)
-                ) {
-                    TagHomeContent(
-                        tagViewModel = tagViewModel,
-                        onTagSelected = { selectedTag ->
-                            tagName = selectedTag
-                        },
-                        onFavouriteSelected = { isFavourite ->
-                            isFavouriteMaterial = if (isFavourite) true else null
-                        })
-                }
-                if (searchQuery.isNotEmpty()) {
-                    NoteSearchHomeContent(
-                        modifier = Modifier.padding(bottom = 60.dp),
-                        viewModel = noteViewModel,
-                        navController = navController,
-                        query = searchQuery
+                    Text(
+                        text = "Метки",
+                        modifier = Modifier.padding(start = 43.dp),
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
                     )
-                } else if (tagName != null) {
-                    NoteTagSearchHomeContent(
-                        modifier = Modifier.padding(bottom = 60.dp),
-                        viewModel = noteViewModel,
-                        navController = navController,
-                        tag = tagName!!
-                    )
-                } else if (isFavouriteMaterial != null) {
-                    NoteFavouriteHomeContent(
-                        modifier = Modifier.padding(bottom = 60.dp),
-                        noteViewModel = noteViewModel,
-                        navController = navController,
-                        isFavourite = isFavouriteMaterial!!
-                    )
-                } else {
-                    NoteHomeContent(
-                        modifier = Modifier.padding(bottom = 60.dp),
-                        viewModel = noteViewModel,
-                        navController = navController
-                    )
-                }
+                    Spacer(modifier = Modifier.height(7.dp))
+                    Row(
+                        modifier = Modifier.padding(start = 43.dp)
+                    ) {
+                        TagHomeContent(
+                            tagViewModel = tagViewModel,
+                            onTagSelected = { selectedTag ->
+                                tagName = selectedTag
+                            },
+                            onFavouriteSelected = { isFavourite ->
+                                isFavouriteMaterial = if (isFavourite) true else null
+                            })
+                    }
+                    if (searchQuery.isNotEmpty()) {
+                        NoteSearchHomeContent(
+                            modifier = Modifier.padding(bottom = 60.dp),
+                            viewModel = noteViewModel,
+                            navController = navController,
+                            query = searchQuery
+                        )
+                    } else if (tagName != null) {
+                        NoteTagSearchHomeContent(
+                            modifier = Modifier.padding(bottom = 60.dp),
+                            viewModel = noteViewModel,
+                            navController = navController,
+                            tag = tagName!!
+                        )
+                    } else if (isFavouriteMaterial != null) {
+                        NoteFavouriteHomeContent(
+                            modifier = Modifier.padding(bottom = 60.dp),
+                            noteViewModel = noteViewModel,
+                            navController = navController,
+                            isFavourite = isFavouriteMaterial!!
+                        )
+                    } else {
+                        NoteHomeContent(
+                            modifier = Modifier.padding(bottom = 60.dp),
+                            viewModel = noteViewModel,
+                            navController = navController
+                        )
+                    }
 
+                }
             }
-        }
-    )
+        )
+    }
+}
 
 
+@Composable
+private fun ThemedLogo() {
+    val isDark = isSystemInDarkTheme()
+
+    if (isDark) {
+        Image(
+            painter = painterResource(id = R.drawable.uroboros_logo_dark),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .padding(end = 10.dp, bottom = 10.dp, start = 13.dp)
+        )
+    } else {
+        Image(
+            painter = painterResource(id = R.drawable.uroboros_logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(85.dp)
+        )
+    }
 }
 
 
@@ -199,30 +223,32 @@ fun ItemCard(
 ) {
     val isCurrent = item == currentItem
 
-    Card(
-        modifier = Modifier
-            .padding(4.dp)
-            .border(
-                BorderStroke(1.dp, colorResource(id = R.color.green)),
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clickable { onClick(item) },
-        colors = CardDefaults.cardColors(containerColor = if (isCurrent) colorResource(id = R.color.green) else Color.Transparent)
-    ) {
-        Box(
+    UroborosTheme {
+        Card(
             modifier = Modifier
-                .wrapContentSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center
+                .padding(4.dp)
+                .border(
+                    BorderStroke(1.dp, colorResource(id = R.color.green)),
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .clickable { onClick(item) },
+            colors = CardDefaults.cardColors(containerColor = if (isCurrent) colorResource(id = R.color.green) else Color.Transparent)
         ) {
-            Text(
-                text = item.tag,
-                fontFamily = acherusFeral,
-                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light,
-                fontSize = 16.sp,
-                modifier = Modifier.align(Alignment.Center),
-                color = if (isCurrent) Color.White else Color.Black
-            )
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = item.tag,
+                    fontFamily = acherusFeral,
+                    fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light,
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(Alignment.Center),
+                    color = if (isCurrent) colorResource(R.color.card_color) else MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
     }
 }
