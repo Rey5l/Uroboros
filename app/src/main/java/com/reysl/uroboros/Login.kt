@@ -1,9 +1,11 @@
 package com.reysl.uroboros
 
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,140 +73,156 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
             else -> Unit
         }
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.background)),
-    ) {
-        Box(
+    UroborosTheme {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp),
-            contentAlignment = Alignment.TopCenter
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 50.dp),
+                contentAlignment = Alignment.TopCenter
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.uroboros_logo),
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .size(85.dp)
-                )
-                Text(
-                    text = stringResource(R.string.uroboros),
-                    fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 35.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                )
-            }
-
-        }
-        Spacer(modifier = Modifier.height(58.dp))
-        Text(
-            text = "Login",
-            fontFamily = acherusFeral,
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(start = 50.dp)
-        )
-        Spacer(modifier = Modifier.height(45.dp))
-        Text(
-            text = "Email   ",
-            fontFamily = acherusFeral,
-            fontWeight = FontWeight.Light,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(start = 50.dp),
-            color = colorResource(id = R.color.registration_color_gray)
-        )
-        Spacer(modifier = Modifier.height(3.dp))
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = {
-                Text(text = "Введите почту")
-            },
-            modifier = Modifier
-                .padding(start = 50.dp)
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Password",
-            fontFamily = acherusFeral,
-            fontWeight = FontWeight.Light,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(start = 50.dp),
-            color = colorResource(id = R.color.registration_color_gray)
-        )
-        Spacer(modifier = Modifier.height(3.dp))
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = {
-                Text(text = "Введите пароль")
-            },
-            trailingIcon = {
-                IconButton(onClick = {isPasswordShow = !isPasswordShow}) {
-                    if (isPasswordShow) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.close_eye),
-                            contentDescription = "show"
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(id = R.drawable.eye),
-                            contentDescription = "don't show"
-                        )
-                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ThemedLogo()
+                    Text(
+                        text = stringResource(R.string.uroboros),
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 35.sp,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                    )
                 }
-            },
-            visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier
-                .padding(start = 50.dp),
-        )
-        Spacer(modifier = Modifier.height(25.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
 
-        ) {
+            }
+            Spacer(modifier = Modifier.height(58.dp))
             Text(
-                text = "У меня нет аккаунта",
-                modifier = Modifier.clickable { navController.navigate("registration") },
-                textAlign = TextAlign.Center,
+                text = "Login",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp,
+                modifier = Modifier.padding(start = 50.dp)
+            )
+            Spacer(modifier = Modifier.height(45.dp))
+            Text(
+                text = "Email",
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Light,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier.padding(start = 50.dp),
+                color = colorResource(id = R.color.registration_color_gray)
             )
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = { authViewModel.login(email, password) },
-                enabled = authState.value != AuthState.Loading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.green),
-                    contentColor = colorResource(id = R.color.white)
-                ),
+            Spacer(modifier = Modifier.height(3.dp))
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = {
+                    Text(text = "Введите почту")
+                },
                 modifier = Modifier
-                    .padding(top = 34.dp)
-                    .width(330.dp)
-                    .height(55.dp)
+                    .padding(start = 50.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Password",
+                fontFamily = acherusFeral,
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(start = 50.dp),
+                color = colorResource(id = R.color.registration_color_gray)
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = {
+                    Text(text = "Введите пароль")
+                },
+                trailingIcon = {
+                    IconButton(onClick = {isPasswordShow = !isPasswordShow}) {
+                        if (isPasswordShow) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close_eye),
+                                contentDescription = "show"
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.eye),
+                                contentDescription = "don't show"
+                            )
+                        }
+                    }
+                },
+                visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
+                modifier = Modifier
+                    .padding(start = 50.dp),
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+
             ) {
                 Text(
-                    "Login",
+                    text = "У меня нет аккаунта",
+                    modifier = Modifier.clickable { navController.navigate("registration") },
+                    textAlign = TextAlign.Center,
                     fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Light,
                     fontSize = 16.sp
                 )
             }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    onClick = { authViewModel.login(email, password) },
+                    enabled = authState.value != AuthState.Loading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(id = R.color.green),
+                        contentColor = colorResource(id = R.color.white)
+                    ),
+                    modifier = Modifier
+                        .padding(top = 34.dp)
+                        .width(330.dp)
+                        .height(55.dp)
+                ) {
+                    Text(
+                        "Login",
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+
         }
+    }
 
+}
 
+@Composable
+private fun ThemedLogo() {
+    val isDarkTheme = isSystemInDarkTheme()
+
+    if (isDarkTheme) {
+        Image(
+            painter = painterResource(id = R.drawable.uroboros_logo_dark),
+            contentDescription = "Logo",
+            modifier = Modifier.padding(end = 10.dp).padding(bottom = 10.dp)
+        )
+    } else {
+        Image(
+            painter = painterResource(id = R.drawable.uroboros_logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(85.dp)
+        )
     }
 }

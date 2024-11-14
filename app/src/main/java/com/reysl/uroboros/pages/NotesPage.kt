@@ -1,11 +1,13 @@
 package com.reysl.uroboros.pages
 
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
@@ -73,6 +76,7 @@ import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.formatTime
+import java.util.Date
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -85,93 +89,96 @@ fun NotesPage(
     val context = LocalContext.current
     val state = rememberRichTextState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxHeight(),
-    ) {
-        Box(
+    UroborosTheme {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(230.dp)
-                .background(colorResource(id = R.color.green))
+                .fillMaxHeight(),
         ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 20.dp, top = 30.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    IconButton(onClick = { showDialog = true }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.adding),
-                            contentDescription = "Add note",
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
-                }
-                if (latestTitle == "") {
-                    Text(
-                        text = "New",
-                        fontFamily = acherusFeral,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 39.sp,
-                        modifier = Modifier.padding(start = 30.dp),
-                        color = colorResource(id = R.color.white),
-                        style = TextStyle(lineHeight = 50.sp)
-                    )
-                } else {
-                    Text(
-                        text = latestTitle,
-                        fontFamily = acherusFeral,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 39.sp,
-                        modifier = Modifier.padding(start = 30.dp),
-                        color = colorResource(id = R.color.white),
-                        style = TextStyle(lineHeight = 50.sp)
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 20.dp, bottom = 20.dp),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    Card(
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.light_green)),
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(230.dp)
+                    .background(colorResource(id = R.color.green))
+            ) {
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 20.dp, top = 30.dp),
+                        contentAlignment = Alignment.CenterEnd
                     ) {
+                        IconButton(onClick = { showDialog = true }) {
+                            Image(
+                                painter = painterResource(id = R.drawable.adding),
+                                contentDescription = "Add note",
+                                modifier = Modifier.size(64.dp)
+                            )
+                        }
+                    }
+                    if (latestTitle == "") {
                         Text(
-                            text = formatTime(java.util.Date()),
+                            text = "New",
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = colorResource(id = R.color.green),
-                            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp)
+                            fontSize = 39.sp,
+                            modifier = Modifier.padding(start = 30.dp),
+                            color = colorResource(id = R.color.white),
+                            style = TextStyle(lineHeight = 50.sp)
                         )
+                    } else {
+                        Text(
+                            text = latestTitle,
+                            fontFamily = acherusFeral,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 39.sp,
+                            modifier = Modifier.padding(start = 30.dp),
+                            color = colorResource(id = R.color.white),
+                            style = TextStyle(lineHeight = 50.sp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 20.dp, bottom = 20.dp),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.light_green)),
+                        ) {
+                            Text(
+                                text = formatTime(Date()),
+                                fontFamily = acherusFeral,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = colorResource(id = R.color.green),
+                                modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp)
+                            )
+                        }
                     }
                 }
             }
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            TextEditor(state)
-        }
-    }
-    if (showDialog) {
-        AddMaterialDialog(
-            onDismissRequest = { showDialog = false },
-            onAddMaterial = { title, description, tag ->
-                noteViewModel.addNote(title, description, tag, state.toHtml(), context)
-                showDialog = false
-                latestTitle = title
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                TextEditor(state)
             }
-        )
+        }
+        if (showDialog) {
+            AddMaterialDialog(
+                onDismissRequest = { showDialog = false },
+                onAddMaterial = { title, description, tag ->
+                    noteViewModel.addNote(title, description, tag, state.toHtml(), context)
+                    showDialog = false
+                    latestTitle = title
+                }
+            )
+        }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -183,63 +190,73 @@ fun TextEditor(
     val titleSize = MaterialTheme.typography.titleLarge.fontSize
     val subtitleSize = MaterialTheme.typography.titleLarge.fontSize
 
-    Scaffold {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = 20.dp)
-                .padding(bottom = it.calculateBottomPadding())
-                .padding(top = it.calculateTopPadding()),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            EditorControls(
+    UroborosTheme {
+        Scaffold {
+            Column(
                 modifier = Modifier
-                    .weight(2f)
-                    .padding(bottom = 20.dp),
-                state = state,
-                onBoldClick = {
-                    state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                },
-                onItalicClick = {
-                    state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                },
-                onUnderlineClick = {
-                    state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                },
-                onTitleClick = {
-                    state.toggleSpanStyle(SpanStyle(fontSize = titleSize))
-                },
-                onSubtitleClick = {
-                    state.toggleSpanStyle(SpanStyle(fontSize = subtitleSize))
-                },
-                onTextColorClick = {
-                    state.toggleSpanStyle(SpanStyle(color = Color.Red))
-                },
-                onStartAlignClick = {
-                    state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
-                },
-                onEndAlignClick = {
-                    state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
-                },
-                onCenterAlignClick = {
-                    state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
-                },
-            )
-            RichTextEditor(
-                colors = RichTextEditorDefaults.richTextEditorColors(containerColor = colorResource(R.color.rich_text_editor_background)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(8f),
-                state = state,
-                textStyle = TextStyle(
-                    fontFamily = acherusFeral,
-                    fontSize = 16.sp
-                ),
-            )
+                    .fillMaxSize()
+                    .padding(all = 20.dp)
+                    .padding(bottom = it.calculateBottomPadding())
+                    .padding(top = it.calculateTopPadding()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val isDark = isSystemInDarkTheme()
+                EditorControls(
+                    modifier = Modifier
+                        .weight(2f)
+                        .padding(bottom = 20.dp),
+                    state = state,
+                    onBoldClick = {
+                        state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                    },
+                    onItalicClick = {
+                        state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+                    },
+                    onUnderlineClick = {
+                        state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                    },
+                    onTitleClick = {
+                        state.toggleSpanStyle(SpanStyle(fontSize = titleSize))
+                    },
+                    onSubtitleClick = {
+                        state.toggleSpanStyle(SpanStyle(fontSize = subtitleSize))
+                    },
+                    onTextColorClick = {
+                        state.toggleSpanStyle(SpanStyle(color = Color.Red))
+                    },
+                    onStartAlignClick = {
+                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
+                    },
+                    onEndAlignClick = {
+                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
+                    },
+                    onCenterAlignClick = {
+                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
+                    },
+                )
+                RichTextEditor(
+                    colors = RichTextEditorDefaults.richTextEditorColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        cursorColor = colorResource(R.color.green),
+                        selectionColors = TextSelectionColors(
+                            handleColor = colorResource(R.color.green),
+                            backgroundColor = colorResource(if (isDark) R.color.green else R.color.card_color)
+                        )
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(8f),
+                    state = state,
+                    textStyle = TextStyle(
+                        fontFamily = acherusFeral,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                )
+            }
         }
     }
-
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -270,192 +287,194 @@ fun EditorControls(
     var linkText by remember { mutableStateOf("") }
     var link by remember { mutableStateOf("") }
 
-    AnimatedVisibility(visible = showLinkDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showLinkDialog = false
-                linkSelected = false
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        state.addLink(
-                            text = linkText,
-                            url = link
+    UroborosTheme {
+        AnimatedVisibility(visible = showLinkDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showLinkDialog = false
+                    linkSelected = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            state.addLink(
+                                text = linkText,
+                                url = link
+                            )
+                            showLinkDialog = false
+                            linkSelected = false
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
+                    ) {
+                        Text(
+                            "Confirm",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = acherusFeral
                         )
-                        showLinkDialog = false
-                        linkSelected = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                ) {
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showLinkDialog = false
+                            linkSelected = false
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
+                    ) {
+                        Text(
+                            "Cancel",
+                            fontFamily = acherusFeral,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                title = {
                     Text(
-                        "Confirm",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = acherusFeral
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showLinkDialog = false
-                        linkSelected = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                ) {
-                    Text(
-                        "Cancel",
+                        text = "Add Link",
                         fontFamily = acherusFeral,
-                        fontSize = 16.sp,
+                        color = colorResource(R.color.green),
                         fontWeight = FontWeight.Bold
                     )
-                }
-            },
-            title = {
-                Text(
-                    text = "Add Link",
-                    fontFamily = acherusFeral,
-                    color = colorResource(R.color.green),
-                    fontWeight = FontWeight.Bold
+                },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = linkText,
+                            onValueChange = { linkText = it },
+                            label = { Text("Text to display", fontFamily = acherusFeral) }
+                        )
+                        OutlinedTextField(
+                            value = link,
+                            onValueChange = { link = it },
+                            label = { Text("Link URL", fontFamily = acherusFeral) }
+                        )
+                    }
+                },
+                containerColor = colorResource(id = R.color.light_green)
+            )
+
+        }
+
+        FlowRow(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(all = 10.dp)
+                .padding(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ControlWrapper(
+                selected = boldSelected,
+                onChangeClick = { boldSelected = it },
+                onClick = onBoldClick,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatBold,
+                    contentDescription = "Bold Control",
+                    tint = Color.White
                 )
-            },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = linkText,
-                        onValueChange = { linkText = it },
-                        label = { Text("Text to display", fontFamily = acherusFeral) }
-                    )
-                    OutlinedTextField(
-                        value = link,
-                        onValueChange = { link = it },
-                        label = { Text("Link URL", fontFamily = acherusFeral) }
-                    )
-                }
-            },
-            containerColor = colorResource(id = R.color.light_green)
-        )
-
-    }
-
-    FlowRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(all = 10.dp)
-            .padding(bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        ControlWrapper(
-            selected = boldSelected,
-            onChangeClick = { boldSelected = it },
-            onClick = onBoldClick,
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatBold,
-                contentDescription = "Bold Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = italicSelected,
-            onChangeClick = { italicSelected = it },
-            onClick = onItalicClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatItalic,
-                contentDescription = "Italic Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = underlineSelected,
-            onChangeClick = { underlineSelected = it },
-            onClick = onUnderlineClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatUnderlined,
-                contentDescription = "Underline Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = titleSelected,
-            onChangeClick = { titleSelected = it },
-            onClick = onTitleClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.Title,
-                contentDescription = "Title Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = subtitleSelected,
-            onChangeClick = { subtitleSelected = it },
-            onClick = onSubtitleClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatSize,
-                contentDescription = "Subtitle Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = textColorSelected,
-            onChangeClick = { textColorSelected = it },
-            onClick = onTextColorClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatColorText,
-                contentDescription = "Text Color Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = linkSelected,
-            onChangeClick = { linkSelected = it },
-            onClick = { showLinkDialog = true }
-        ) {
-            Icon(
-                imageVector = Icons.Default.AddLink,
-                contentDescription = "Link Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = alignmentSelected == 0,
-            onChangeClick = { alignmentSelected = 0 },
-            onClick = onStartAlignClick
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
-                contentDescription = "Start Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = alignmentSelected == 1,
-            onChangeClick = { alignmentSelected = 1 },
-            onClick = onCenterAlignClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatAlignCenter,
-                contentDescription = "Center Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        ControlWrapper(
-            selected = alignmentSelected == 2,
-            onChangeClick = { alignmentSelected = 2 },
-            onClick = onEndAlignClick
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
-                contentDescription = "End Align Control",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
+            }
+            ControlWrapper(
+                selected = italicSelected,
+                onChangeClick = { italicSelected = it },
+                onClick = onItalicClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatItalic,
+                    contentDescription = "Italic Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = underlineSelected,
+                onChangeClick = { underlineSelected = it },
+                onClick = onUnderlineClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatUnderlined,
+                    contentDescription = "Underline Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = titleSelected,
+                onChangeClick = { titleSelected = it },
+                onClick = onTitleClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Title,
+                    contentDescription = "Title Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = subtitleSelected,
+                onChangeClick = { subtitleSelected = it },
+                onClick = onSubtitleClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatSize,
+                    contentDescription = "Subtitle Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = textColorSelected,
+                onChangeClick = { textColorSelected = it },
+                onClick = onTextColorClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatColorText,
+                    contentDescription = "Text Color Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = linkSelected,
+                onChangeClick = { linkSelected = it },
+                onClick = { showLinkDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AddLink,
+                    contentDescription = "Link Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = alignmentSelected == 0,
+                onChangeClick = { alignmentSelected = 0 },
+                onClick = onStartAlignClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.FormatAlignLeft,
+                    contentDescription = "Start Align Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = alignmentSelected == 1,
+                onChangeClick = { alignmentSelected = 1 },
+                onClick = onCenterAlignClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FormatAlignCenter,
+                    contentDescription = "Center Align Control",
+                    tint = Color.White
+                )
+            }
+            ControlWrapper(
+                selected = alignmentSelected == 2,
+                onChangeClick = { alignmentSelected = 2 },
+                onClick = onEndAlignClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.FormatAlignRight,
+                    contentDescription = "End Align Control",
+                    tint = Color.White
+                )
+            }
         }
     }
 }
@@ -469,26 +488,28 @@ fun ControlWrapper(
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(size = 6.dp))
-            .clickable {
-                onClick()
-                onChangeClick(!selected)
-            }
-            .background(
-                if (selected) selectedColor
-                else unselectedColor
-            )
-            .border(
-                width = 1.dp,
-                color = colorResource(R.color.white),
-                shape = RoundedCornerShape(size = 6.dp)
-            )
-            .padding(all = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
+    UroborosTheme {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(size = 6.dp))
+                .clickable {
+                    onClick()
+                    onChangeClick(!selected)
+                }
+                .background(
+                    if (selected) selectedColor
+                    else unselectedColor
+                )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(R.color.green),
+                    shape = RoundedCornerShape(size = 6.dp)
+                )
+                .padding(all = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            content()
+        }
     }
 }
 

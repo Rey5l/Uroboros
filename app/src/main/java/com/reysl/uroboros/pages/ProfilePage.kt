@@ -1,5 +1,6 @@
 package com.reysl.uroboros.pages
 
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -25,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -169,270 +172,271 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         }
     }
 
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.background)),
-    ) {
-        Box(
+    UroborosTheme {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp, end = 10.dp),
-            contentAlignment = Alignment.CenterEnd
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
         ) {
-            IconButton(onClick = { showSignoutConfirmationDialog = true }) {
-                Image(
-                    painter = painterResource(id = R.drawable.log_out),
-                    contentDescription = "Log out",
-                    modifier = Modifier.size(28.dp)
-                )
-            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp, end = 10.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                IconButton(onClick = { showSignoutConfirmationDialog = true }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.log_out),
+                        contentDescription = "Log out",
+                        modifier = Modifier.size(28.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                    )
+                }
 
-        }
-        if (showSignoutConfirmationDialog) {
-            SignoutConfirmationDialog(onSignoutConfirmed = {
-                authViewModel.signout()
-                showSignoutConfirmationDialog = false
-            }, onDismiss = {
-                showSignoutConfirmationDialog = false
-            })
-        }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (isLoadingInitial) {
-                CircularProgressIndicator(modifier = Modifier.size(120.dp))
-            } else {
-                Box(
-                    contentAlignment = Alignment.BottomEnd,
-                    modifier = Modifier.size(120.dp)
-                ) {
+            }
+            if (showSignoutConfirmationDialog) {
+                SignoutConfirmationDialog(onSignoutConfirmed = {
+                    authViewModel.signout()
+                    showSignoutConfirmationDialog = false
+                }, onDismiss = {
+                    showSignoutConfirmationDialog = false
+                })
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isLoadingInitial) {
+                    CircularProgressIndicator(modifier = Modifier.size(120.dp))
+                } else {
                     Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                            .border(2.dp, colorResource(id = R.color.green), CircleShape),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.BottomEnd,
+                        modifier = Modifier.size(120.dp)
                     ) {
-                        ProfileImage(imageUrl = avatarUri)
-                    }
-                    IconButton(
-                        onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .size(24.dp)
-                            .background(Color.White, CircleShape)
-                            .border(1.dp, Color.Gray, CircleShape)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.camera),
-                            contentDescription = "Edit",
-                            tint = Color.Black,
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .background(Color.Gray)
+                                .border(2.dp, colorResource(id = R.color.green), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ProfileImage(imageUrl = avatarUri)
+                        }
+                        IconButton(
+                            onClick = { imagePickerLauncher.launch("image/*") },
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(Color.White, CircleShape)
+                                .border(1.dp, Color.Gray, CircleShape)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.camera),
+                                contentDescription = "Edit",
+                                tint = Color.Black,
+                            )
+                        }
                     }
                 }
+                if (isLoadingImage) {
+                    CircularProgressIndicator(modifier = Modifier.size(120.dp))
+                }
             }
-            if (isLoadingImage) {
-                CircularProgressIndicator(modifier = Modifier.size(120.dp))
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column {
-                Text(
-                    text = "Full Name",
-                    fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 16.sp,
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(value = name, onValueChange = { name = it })
-            }
-
-        }
-        Spacer(modifier = Modifier.height(50.dp))
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                text = "Change password",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = acherusFeral,
-            )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column {
-                Text(
-                    text = "Old password",
-                    fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 16.sp,
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = oldPassword,
-                    onValueChange = { oldPassword = it },
-                    trailingIcon = {
-                        IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
-                            if (isPasswordShow) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close_eye),
-                                    contentDescription = "show"
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye),
-                                    contentDescription = "don't show"
-                                )
-                            }
-                        }
-                    },
-                    visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation()
-                )
-            }
-
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column {
-                Text(
-                    text = "New password",
-                    fontFamily = acherusFeral,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 16.sp,
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = newPassword,
-                    onValueChange = { newPassword = it },
-                    trailingIcon = {
-                        IconButton(onClick = { isNewPasswordShow = !isNewPasswordShow }) {
-                            if (isNewPasswordShow) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close_eye),
-                                    contentDescription = "show"
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye),
-                                    contentDescription = "don't show"
-                                )
-                            }
-                        }
-                    },
-                    visualTransformation = if (isNewPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
-                )
-            }
-
-        }
-        Spacer(modifier = Modifier.height(30.dp))
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Button(
-                onClick = {
-                    if (newPassword.isNotEmpty() && oldPassword.isNotEmpty()) {
-                        authViewModel.changePassword(oldPassword, newPassword)
-                    }
-                    if (initialName != name) {
-                        saveUsernameToFirebase(name)
-                    }
-                    if (avatarUri != null) {
-                        avatarUri.let { uri ->
-                            uploadImageToFirebase(uri, context) { downloadUri ->
-                                avatarUri = downloadUri
-                                saveAvatarUrlToDatabase(uri.toString())
-                            }
-                        }
-                    }
-                }, colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(
-                        id = R.color.green
-                    ),
-                    contentColor = colorResource(
-                        id = R.color.white
-                    )
-                ),
-                modifier = Modifier
-                    .width(350.dp)
-                    .height(55.dp)
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Сохранить",
-                    fontFamily = acherusFeral,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            if (showSuccessDialog) {
-                AlertDialog(
-                    onDismissRequest = { showSuccessDialog = false },
-                    title = { Text(text = "Успех!") },
-                    text = {
-                        Text(
-                            text = "Пароль успешно изменен!"
-                        )
-                    },
-                    confirmButton = {
-                        Button(onClick = { showSuccessDialog = false }) {
-                            Text(text = "OK")
-                        }
-                    }
-                )
-            }
-
-            if (showErrorDialog != null) {
-                AlertDialog(
-                    onDismissRequest = { showErrorDialog = null },
-                    title = { Text(text = "Ошибка!") },
-                    text = { Text(text = "Не удалось изменить пароль") },
-                    confirmButton = {
-                        Button(onClick = { showErrorDialog = null }) {
-                            Text(text = "ОК")
-                        }
-                    }
-                )
-            }
-
-            if (showSuccessChangeNameDialog) {
-                AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false }, title = {
+                Column {
                     Text(
-                        text = "Успех!"
+                        text = "Full Name",
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 16.sp,
                     )
-                }, text = { Text(text = "Имя успешно изменено!") },
-                    confirmButton = {
-                        Button(onClick = { showSuccessChangeNameDialog = false }) {
-                            Text(text = "OK")
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(value = name, onValueChange = { name = it })
+                }
+
+            }
+            Spacer(modifier = Modifier.height(50.dp))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Change password",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = acherusFeral,
                 )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+                    Text(
+                        text = "Old password",
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 16.sp,
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = oldPassword,
+                        onValueChange = { oldPassword = it },
+                        trailingIcon = {
+                            IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
+                                if (isPasswordShow) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.close_eye),
+                                        contentDescription = "show"
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.eye),
+                                        contentDescription = "don't show"
+                                    )
+                                }
+                            }
+                        },
+                        visualTransformation = if (isPasswordShow) VisualTransformation.None else PasswordVisualTransformation()
+                    )
+                }
+
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+                    Text(
+                        text = "New password",
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 16.sp,
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        trailingIcon = {
+                            IconButton(onClick = { isNewPasswordShow = !isNewPasswordShow }) {
+                                if (isNewPasswordShow) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.close_eye),
+                                        contentDescription = "show"
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.eye),
+                                        contentDescription = "don't show"
+                                    )
+                                }
+                            }
+                        },
+                        visualTransformation = if (isNewPasswordShow) VisualTransformation.None else PasswordVisualTransformation(),
+                    )
+                }
+
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Button(
+                    onClick = {
+                        if (newPassword.isNotEmpty() && oldPassword.isNotEmpty()) {
+                            authViewModel.changePassword(oldPassword, newPassword)
+                        }
+                        if (initialName != name) {
+                            saveUsernameToFirebase(name)
+                        }
+                        if (avatarUri != null) {
+                            avatarUri.let { uri ->
+                                uploadImageToFirebase(uri, context) { downloadUri ->
+                                    avatarUri = downloadUri
+                                    saveAvatarUrlToDatabase(uri.toString())
+                                }
+                            }
+                        }
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(
+                            id = R.color.green
+                        ),
+                        contentColor = colorResource(
+                            id = R.color.white
+                        )
+                    ),
+                    modifier = Modifier
+                        .width(350.dp)
+                        .height(55.dp)
+                ) {
+                    Text(
+                        text = "Сохранить",
+                        fontFamily = acherusFeral,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                if (showSuccessDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showSuccessDialog = false },
+                        title = { Text(text = "Успех!") },
+                        text = {
+                            Text(
+                                text = "Пароль успешно изменен!"
+                            )
+                        },
+                        confirmButton = {
+                            Button(onClick = { showSuccessDialog = false }) {
+                                Text(text = "OK")
+                            }
+                        }
+                    )
+                }
+
+                if (showErrorDialog != null) {
+                    AlertDialog(
+                        onDismissRequest = { showErrorDialog = null },
+                        title = { Text(text = "Ошибка!") },
+                        text = { Text(text = "Не удалось изменить пароль") },
+                        confirmButton = {
+                            Button(onClick = { showErrorDialog = null }) {
+                                Text(text = "ОК")
+                            }
+                        }
+                    )
+                }
+
+                if (showSuccessChangeNameDialog) {
+                    AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false }, title = {
+                        Text(
+                            text = "Успех!"
+                        )
+                    }, text = { Text(text = "Имя успешно изменено!") },
+                        confirmButton = {
+                            Button(onClick = { showSuccessChangeNameDialog = false }) {
+                                Text(text = "OK")
+                            }
+                        }
+                    )
+                }
+
+                if (showErrorChangeNameDialog != null) {
+                    AlertDialog(
+                        onDismissRequest = { showErrorChangeNameDialog = null },
+                        title = { Text(text = "Ошибка!") },
+                        text = { Text(text = "Не получилось сменить имя") },
+                        confirmButton = {
+                            Button(onClick = { showErrorChangeNameDialog = null }) {
+                                Text(text = "OK")
+                            }
+                        }
+                    )
+                }
             }
 
-            if (showErrorChangeNameDialog != null) {
-                AlertDialog(
-                    onDismissRequest = { showErrorChangeNameDialog = null },
-                    title = { Text(text = "Ошибка!") },
-                    text = { Text(text = "Не получилось сменить имя") },
-                    confirmButton = {
-                        Button(onClick = { showErrorChangeNameDialog = null }) {
-                            Text(text = "OK")
-                        }
-                    }
-                )
-            }
+
         }
-
-
     }
 }
 
@@ -441,45 +445,47 @@ fun SignoutConfirmationDialog(
     onSignoutConfirmed: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Выйти из аккаунта",
-                fontFamily = acherusFeral,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Text(
-                text = "Вы уверены, что хотите выйти из аккаунта?",
-                fontFamily = acherusFeral,
-                fontWeight = FontWeight.Light,
-                fontSize = 16.sp
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = onSignoutConfirmed,
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.green))
-            ) {
+    UroborosTheme {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
                 Text(
-                    text = "Выйти",
-                    color = colorResource(id = R.color.card_color),
+                    text = "Выйти из аккаунта",
                     fontFamily = acherusFeral,
                     fontWeight = FontWeight.Bold
                 )
+            },
+            text = {
+                Text(
+                    text = "Вы уверены, что хотите выйти из аккаунта?",
+                    fontFamily = acherusFeral,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = onSignoutConfirmed,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.green))
+                ) {
+                    Text(
+                        text = "Выйти",
+                        color = colorResource(id = R.color.card_color),
+                        fontFamily = acherusFeral,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.card_color))
+                ) {
+                    Text(text = "Отмена", color = colorResource(id = R.color.green))
+                }
             }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.card_color))
-            ) {
-                Text(text = "Отмена", color = colorResource(id = R.color.green))
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable

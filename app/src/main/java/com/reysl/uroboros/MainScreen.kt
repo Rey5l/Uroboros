@@ -3,10 +3,12 @@ package com.reysl.uroboros
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -32,6 +34,7 @@ import com.reysl.uroboros.data.db.tag_db.TagViewModel
 import com.reysl.uroboros.pages.HomePage
 import com.reysl.uroboros.pages.NotesPage
 import com.reysl.uroboros.pages.ProfilePage
+import com.reysl.uroboros.ui.theme.UroborosTheme
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
@@ -56,53 +59,54 @@ fun MainScreen(modifier: Modifier = Modifier, navController: NavController, auth
     )
 
 
+    UroborosTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                NavigationBar(
+                    modifier = Modifier.background(colorResource(id = R.color.navbar_bg))
+                ) {
+                    val isDark = isSystemInDarkTheme()
+                    navItemList.forEachIndexed { index, navItem ->
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val isHovered by interactionSource.collectIsHoveredAsState()
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            NavigationBar(
-                modifier = Modifier.background(colorResource(id = R.color.navbar_bg))
-            ) {
-                navItemList.forEachIndexed { index, navItem ->
-                    val interactionSource = remember { MutableInteractionSource() }
-                    val isHovered by interactionSource.collectIsHoveredAsState()
-
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                        },
-                        icon = {
-                            Icon(
-                                painter = navItem.icon,
-                                contentDescription = "${navItem.label}",
-                                modifier = Modifier.size(23.dp)
-                            )
-                        },
-                        label = {
-                            Text(
-                                text = navItem.label,
-                                fontSize = 12.sp,
-                                fontFamily = acherusFeral,
-                                fontWeight = if (isHovered) FontWeight.Bold else FontWeight.Light
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = colorResource(id = R.color.white),
-                            unselectedIconColor = colorResource(id = R.color.black),
-                            selectedTextColor = colorResource(id = R.color.green),
-                            unselectedTextColor = colorResource(id = R.color.black),
-                            indicatorColor = colorResource(id = R.color.green)
-                        ),
-                        interactionSource = interactionSource
-                    )
+                        NavigationBarItem(
+                            selected = selectedIndex == index,
+                            onClick = {
+                                selectedIndex = index
+                            },
+                            icon = {
+                                Icon(
+                                    painter = navItem.icon,
+                                    contentDescription = "${navItem.label}",
+                                    modifier = Modifier.size(23.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = navItem.label,
+                                    fontSize = 12.sp,
+                                    fontFamily = acherusFeral,
+                                    fontWeight = if (isHovered) FontWeight.Bold else FontWeight.Light
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = colorResource(if (isDark) R.color.card_color else R.color.white),
+                                unselectedIconColor = MaterialTheme.colorScheme.onBackground,
+                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedTextColor = MaterialTheme.colorScheme.onBackground,
+                                indicatorColor = colorResource(id = R.color.green)
+                            ),
+                            interactionSource = interactionSource
+                        )
+                    }
                 }
             }
+        ) { innerPadding ->
+            ContentScreen(modifier = Modifier.padding(innerPadding), index = selectedIndex, navController, authViewModel)
         }
-    ) { innerPadding ->
-        ContentScreen(modifier = Modifier.padding(innerPadding), index = selectedIndex, navController, authViewModel)
     }
-
 }
 
 @Composable
