@@ -77,26 +77,22 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // added dependencies
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation(libs.androidx.runtime.livedata.v175)
 
-    val work_version = "2.9.1"
-    implementation("androidx.work:work-runtime-ktx:$work_version")
-
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Rich Text Editor
 
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc09")
+    implementation(libs.richeditor.compose)
 
-    implementation("androidx.compose.material:material-icons-extended:1.5.3")
+    implementation(libs.androidx.material.icons.extended)
 
     // Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc02")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0-rc02")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
 }

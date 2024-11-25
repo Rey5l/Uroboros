@@ -1,7 +1,7 @@
 package com.reysl.uroboros.pages
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -10,8 +10,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,9 +55,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -64,6 +69,7 @@ import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.saveUsernameToFirebase
+import com.reysl.uroboros.ui.theme.UroborosTheme
 
 
 @Composable
@@ -95,6 +101,10 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
     }
 
     var showSignoutConfirmationDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showInfoDialog by remember {
         mutableStateOf(false)
     }
 
@@ -178,12 +188,21 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         ) {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp, end = 10.dp),
-                contentAlignment = Alignment.CenterEnd
+                    .padding(top = 30.dp, start = 10.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                IconButton(onClick = { showInfoDialog = true }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.info),
+                        contentDescription = "About",
+                        modifier = Modifier.size(32.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                    )
+                }
                 IconButton(onClick = { showSignoutConfirmationDialog = true }) {
                     Image(
                         painter = painterResource(id = R.drawable.log_out),
@@ -194,6 +213,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 }
 
             }
+
             if (showSignoutConfirmationDialog) {
                 SignoutConfirmationDialog(onSignoutConfirmed = {
                     authViewModel.signout()
@@ -201,6 +221,15 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 }, onDismiss = {
                     showSignoutConfirmationDialog = false
                 })
+            }
+
+            if (showInfoDialog) {
+                InfoDialog(
+                    showDialog = showInfoDialog,
+                    onDismiss = {
+                        showInfoDialog = false
+                    }
+                )
             }
             Box(
                 contentAlignment = Alignment.Center,
@@ -408,11 +437,13 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 }
 
                 if (showSuccessChangeNameDialog) {
-                    AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false }, title = {
-                        Text(
-                            text = "Успех!"
-                        )
-                    }, text = { Text(text = "Имя успешно изменено!") },
+                    AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false },
+                        title = {
+                            Text(
+                                text = "Успех!"
+                            )
+                        },
+                        text = { Text(text = "Имя успешно изменено!") },
                         confirmButton = {
                             Button(onClick = { showSuccessChangeNameDialog = false }) {
                                 Text(text = "OK")
@@ -439,6 +470,103 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         }
     }
 }
+
+@Composable
+fun InfoDialog(showDialog: Boolean, onDismiss: () -> Unit) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = {
+                Text("Информация")
+            },
+            text = {
+                Column {
+                    InfoItem(
+                        icon = R.drawable.donation,
+                        label = "Поддержать автора",
+                        url = "https://www.donationalerts.com/r/reysl"
+                    )
+                    InfoItem(
+                        icon = R.drawable.code,
+                        label = "Исходный код",
+                        url = "https://github.com/Rey5l/Uroboros"
+                    )
+                    InfoItem(
+                        icon = R.drawable.telegram,
+                        label = "Телеграм-канал",
+                        url = "https://t.me/reysldevblog"
+                    )
+                    InfoItem(
+                        icon = R.drawable.instruction,
+                        label = "Инструкция по использованию",
+                        url = "https://t.me/reysldevblog"
+                    )
+                    InfoItem(
+                        icon = R.drawable.help,
+                        label = "Обратная связь",
+                        email = "Rey5l@yandex.ru"
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Закрыть", color = MaterialTheme.colorScheme.onPrimary)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun InfoItem(icon: Int, label: String, url: String? = null, email: String? = null) {
+    val context = LocalContext.current
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable {
+                if (url != null) {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    context.startActivity(intent)
+                } else if (email != null) {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:$email")
+                    }
+                    context.startActivity(intent)
+                }
+            }
+    ) {
+        if (icon == R.drawable.donation) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = label,
+                tint = colorResource(R.color.orange_donation),
+                modifier = Modifier.size(24.dp),
+            )
+        } else {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = label,
+                tint = colorResource(R.color.green),
+                modifier = Modifier.size(24.dp),
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        if (label == "Поддержать автора") {
+            Text(
+                text = label,
+                color = colorResource(R.color.orange_donation),
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            Text(text = label)
+        }
+
+    }
+}
+
 
 @Composable
 fun SignoutConfirmationDialog(
@@ -546,3 +674,5 @@ fun saveAvatarUrlToDatabase(avatarUrl: String) {
             }
     }
 }
+
+
