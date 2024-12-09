@@ -35,10 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,10 +69,13 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.reysl.uroboros.AuthViewModel
 import com.reysl.uroboros.AuthViewModel.AuthState
+import com.reysl.uroboros.DataStoreManager
 import com.reysl.uroboros.R
 import com.reysl.uroboros.acherusFeral
 import com.reysl.uroboros.saveUsernameToFirebase
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -78,8 +84,12 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+    val dataStoreManager = DataStoreManager(context)
+
+    val savedName by dataStoreManager.getProfileName().collectAsState(initial = "")
+
     var name by remember {
-        mutableStateOf("user_001")
+        mutableStateOf(savedName ?: "")
     }
 
     var initialName by remember { mutableStateOf("user_001") }
@@ -124,8 +134,11 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         mutableStateOf<String?>(null)
     }
 
+
     var isLoadingImage by remember { mutableStateOf(false) }
     var isLoadingInitial by remember { mutableStateOf(true) }
+
+    val coroutine = rememberCoroutineScope()
 
     val currentUser = FirebaseAuth.getInstance().currentUser
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
@@ -133,7 +146,9 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
     val imagePickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                avatarUri = uri
+                coroutine.launch {
+                    dataStoreManager.saveProfileImage(uri.toString())
+                }
                 uploadImageToFirebase(uri, context) { downloadUri ->
                     avatarUri = downloadUri
                     isLoadingImage = false
@@ -144,23 +159,39 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
 
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
-            val userRef =
-                FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
-            userRef.get().addOnSuccessListener { document ->
-                if (document != null && document.contains("avatarUrl")) {
-                    val avatarUrl = document.getString("avatarUrl")
-                    avatarUri = Uri.parse(avatarUrl)
-                }
-                if (document != null && document.contains("username")) {
-                    val username = document.getString("username")
-                    username?.let {
-                        name = it
-                        initialName = it
+            val cachedAvatarUrl = dataStoreManager.getProfileImage().firstOrNull()
+            val cachedUsername = dataStoreManager.getProfileName().firstOrNull()
+
+            if (cachedAvatarUrl != null && cachedUsername != null) {
+                avatarUri = Uri.parse(cachedAvatarUrl)
+                name = cachedUsername
+                isLoadingInitial = false
+            } else {
+                val userRef =
+                    FirebaseFirestore.getInstance().collection("users").document(currentUser.uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document != null && document.contains("avatarUrl")) {
+                        val avatarUrl = document.getString("avatarUrl")
+                        avatarUrl?.let {
+                            avatarUri = Uri.parse(it)
+                            coroutine.launch {
+                                dataStoreManager.saveProfileImage(it)
+                            }
+                        }
                     }
+                    if (document != null && document.contains("username")) {
+                        val username = document.getString("username")
+                        username?.let {
+                            name = it
+                            coroutine.launch {
+                                dataStoreManager.saveProfileName(it)
+                            }
+                        }
+                    }
+                    isLoadingInitial = false
+                }.addOnFailureListener {
+                    isLoadingInitial = false
                 }
-                isLoadingInitial = false
-            }.addOnFailureListener {
-                isLoadingInitial = false
             }
         } else {
             isLoadingInitial = false
@@ -284,7 +315,12 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                         fontSize = 16.sp,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(value = name, onValueChange = { name = it })
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { newName ->
+                            name = newName
+                        }
+                    )
                 }
 
             }
@@ -378,12 +414,18 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                         }
                         if (initialName != name) {
                             saveUsernameToFirebase(name)
+                            coroutine.launch {
+                                dataStoreManager.saveProfileName(name)
+                            }
                         }
                         if (avatarUri != null) {
                             avatarUri.let { uri ->
                                 uploadImageToFirebase(uri, context) { downloadUri ->
                                     avatarUri = downloadUri
                                     saveAvatarUrlToDatabase(uri.toString())
+                                }
+                                coroutine.launch {
+                                    dataStoreManager.saveProfileImage(uri.toString())
                                 }
                             }
                         }
@@ -620,7 +662,7 @@ fun SignoutConfirmationDialog(
 fun ProfileImage(imageUrl: Uri?) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(imageUrl)
+            .data(imageUrl ?: R.drawable.avatar)
             .crossfade(true)
             .diskCachePolicy(CachePolicy.ENABLED)
             .build()

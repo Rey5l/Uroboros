@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,9 +18,6 @@ import com.reysl.uroboros.view.NoteScreen
 fun AppNavigation(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    noteViewModel: NoteViewModel,
-    navController: NavController,
-    startDestination: String
 ) {
     val navController = rememberNavController()
     val showBottomBar = remember {
