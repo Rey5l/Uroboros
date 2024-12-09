@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,46 +26,64 @@ import androidx.navigation.NavController
 import com.reysl.uroboros.data.db.note_db.NoteViewModel
 
 @Composable
-fun NoteHomeContent(modifier: Modifier = Modifier, viewModel: NoteViewModel, navController: NavController) {
+fun NoteHomeContent(
+    modifier: Modifier = Modifier,
+    viewModel: NoteViewModel,
+    navController: NavController
+) {
     val notes by viewModel.noteList.observeAsState()
+    val isLoading by viewModel.isLoading.observeAsState(true)
 
-    if (notes.isNullOrEmpty()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.empty),
-                contentDescription = "List is empty",
-                modifier = Modifier.size(200.dp)
-            )
-            Text(
-                text = "Материалы не добавлены",
-                fontFamily = acherusFeral,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
+    when {
+        isLoading -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(
-                horizontal = 16.dp,
-                vertical = 8.dp
-            ),
-            modifier = modifier
-                .fillMaxHeight()
-        ) {
-            items(
-                items = notes!!,
-                itemContent = {
-                    NoteListItem(note = it, viewModel = viewModel, navController)
-                }
-            )
+        notes.isNullOrEmpty() -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.empty),
+                    contentDescription = "List is empty",
+                    modifier = Modifier.size(200.dp)
+                )
+                Text(
+                    text = "Материалы не добавлены",
+                    fontFamily = acherusFeral,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        else -> {
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                ),
+                modifier = modifier
+                    .fillMaxHeight()
+            ) {
+                items(
+                    items = notes!!,
+                    itemContent = {
+                        NoteListItem(note = it, viewModel = viewModel, navController)
+                    }
+                )
+            }
         }
     }
-
 }

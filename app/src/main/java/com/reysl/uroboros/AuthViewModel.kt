@@ -7,7 +7,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 
 class AuthViewModel : ViewModel() {
-    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
@@ -15,7 +15,7 @@ class AuthViewModel : ViewModel() {
         checkAuthStatus()
     }
 
-    fun checkAuthStatus() {
+    private fun checkAuthStatus() {
         if (auth.currentUser == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
@@ -89,11 +89,10 @@ class AuthViewModel : ViewModel() {
     }
 
     sealed class AuthState {
-        object Authenticated : AuthState()
-        object Unauthenticated : AuthState()
-        object Loading : AuthState()
+        data object Authenticated : AuthState()
+        data object Unauthenticated : AuthState()
+        data object Loading : AuthState()
         data class Success(val message: String) : AuthState()
         data class Error(val message: String) : AuthState()
-
     }
 }

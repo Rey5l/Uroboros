@@ -3,6 +3,7 @@ package com.reysl.uroboros.data.db.note_db
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reysl.uroboros.MainApplication
@@ -20,12 +21,20 @@ class NoteViewModel : ViewModel() {
     private val repository: NoteRepository
     val noteDao = MainApplication.noteDatabase.getNoteDao()
     val tagDao = MainApplication.tagDatabase.getTagDao()
+
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     val noteList: LiveData<List<Note>>
 
     init {
         val noteDao = noteDao
         repository = NoteRepository(noteDao)
+
         noteList = repository.getAllNotes()
+        noteList.observeForever {
+            _isLoading.value = false
+        }
     }
 
     fun addNote(title: String, description: String, tag: String, markdownText: String, context: Context) {
