@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.components
 
 import android.app.Application
 import androidx.room.Room

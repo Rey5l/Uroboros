@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.screens
 
 import com.reysl.uroboros.ui.theme.UroborosTheme
 import androidx.compose.foundation.Image
@@ -32,6 +32,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.reysl.uroboros.R
 
 @Composable
 fun StartScreen(navController: NavController) {

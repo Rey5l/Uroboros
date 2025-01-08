@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.data.repository
 
 import androidx.lifecycle.LiveData
 import com.reysl.uroboros.data.Note

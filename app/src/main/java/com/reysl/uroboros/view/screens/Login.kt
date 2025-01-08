@@ -1,6 +1,5 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.screens
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,7 +42,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthViewModel.AuthState
+import com.reysl.uroboros.R
+import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
 
 @Composable
 fun Login(navController: NavController, authViewModel: AuthViewModel) {

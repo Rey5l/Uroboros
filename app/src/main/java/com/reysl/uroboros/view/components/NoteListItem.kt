@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.components
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -39,9 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.reysl.uroboros.R
 import com.reysl.uroboros.data.Note
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.screens.acherusFeral
+import com.reysl.uroboros.viewmodel.NoteViewModel
 import java.text.SimpleDateFormat
 
 @Composable

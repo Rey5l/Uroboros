@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,16 +28,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthViewModel.AuthState
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.data.db.tag_db.TagViewModel
-import com.reysl.uroboros.pages.HomePage
-import com.reysl.uroboros.pages.NotesPage
-import com.reysl.uroboros.pages.ProfilePage
+import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.navigation.NavItem
+import com.reysl.uroboros.view.pages.HomePage
+import com.reysl.uroboros.view.pages.NotesPage
+import com.reysl.uroboros.view.pages.ProfilePage
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
+import com.reysl.uroboros.viewmodel.NoteViewModel
+import com.reysl.uroboros.viewmodel.TagViewModel
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
+fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
 
@@ -110,7 +113,7 @@ fun MainScreen(modifier: Modifier = Modifier, navController: NavController, auth
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier, index: Int, navController: NavController, authViewModel: AuthViewModel) {
+fun ContentScreen(modifier: Modifier = Modifier, index: Int, navController: NavController, authViewModel: AuthViewModel) {
     when (index) {
         0 -> NotesPage(noteViewModel = NoteViewModel())
         1 -> HomePage(authViewModel, navController, noteViewModel = NoteViewModel(), tagViewModel = TagViewModel())

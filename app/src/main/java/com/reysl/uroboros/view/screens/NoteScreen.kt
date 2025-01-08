@@ -1,8 +1,6 @@
-package com.reysl.uroboros.view
+package com.reysl.uroboros.view.screens
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,27 +23,20 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
 import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
-import androidx.compose.material.icons.filled.AddLink
 import androidx.compose.material.icons.filled.FormatAlignCenter
 import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatColorText
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.Title
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -77,8 +68,8 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import com.reysl.uroboros.R
-import com.reysl.uroboros.acherusFeral
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.viewmodel.NoteViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +84,7 @@ fun NoteScreen(
 ) {
 
     val coroutineScope = rememberCoroutineScope()
-    val state = remember { RichTextState().apply { setHtml(noteContent) } }
+    val state = remember { RichTextState().apply { setMarkdown(noteContent) } }
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -143,7 +134,7 @@ fun NoteScreen(
 
                     FloatingActionButton(
                         onClick = {
-                            val updatedContent = state.toHtml()
+                            val updatedContent = state.toMarkdown()
                             coroutineScope.launch {
                                 noteViewModel.noteDao.updateNoteContent(id = noteId, updatedContent)
                             }
@@ -178,13 +169,11 @@ fun NoteScreen(
                 ) {
                     Column {
                         EditorControls(
-                            state = state,
                             onBoldClick = { state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) },
                             onItalicClick = { state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) },
                             onUnderlineClick = { state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline)) },
                             onTitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 24.sp)) },
                             onSubtitleClick = { state.toggleSpanStyle(SpanStyle(fontSize = 20.sp)) },
-                            onTextColorClick = { state.toggleSpanStyle(SpanStyle(color = Color.Red)) },
                             onStartAlignClick = {
                                 state.toggleParagraphStyle(
                                     ParagraphStyle(
@@ -207,6 +196,7 @@ fun NoteScreen(
         }
     }
 }
+
 
 @Composable
 fun TagSection(tag: String) {
@@ -281,13 +271,11 @@ fun TextEditor(
 @Composable
 fun EditorControls(
     modifier: Modifier = Modifier,
-    state: RichTextState,
     onBoldClick: () -> Unit,
     onItalicClick: () -> Unit,
     onUnderlineClick: () -> Unit,
     onTitleClick: () -> Unit,
     onSubtitleClick: () -> Unit,
-    onTextColorClick: () -> Unit,
     onStartAlignClick: () -> Unit,
     onEndAlignClick: () -> Unit,
     onCenterAlignClick: () -> Unit,
@@ -298,106 +286,8 @@ fun EditorControls(
     var underlineSelected by rememberSaveable { mutableStateOf(false) }
     var titleSelected by rememberSaveable { mutableStateOf(false) }
     var subtitleSelected by rememberSaveable { mutableStateOf(false) }
-    var textColorSelected by rememberSaveable { mutableStateOf(false) }
-    var linkSelected by rememberSaveable { mutableStateOf(false) }
     var alignmentSelected by rememberSaveable { mutableIntStateOf(0) }
 
-    var showLinkDialog by remember { mutableStateOf(false) }
-    var linkText by remember { mutableStateOf("") }
-    var link by remember { mutableStateOf("") }
-
-    AnimatedVisibility(visible = showLinkDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showLinkDialog = false
-                linkSelected = false
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        state.addLink(
-                            text = linkText,
-                            url = link
-                        )
-                        showLinkDialog = false
-                        linkSelected = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                ) {
-                    Text(
-                        "Confirm",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = acherusFeral
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showLinkDialog = false
-                        linkSelected = false
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                ) {
-                    Text(
-                        "Cancel",
-                        fontFamily = acherusFeral,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            },
-            title = {
-                Text(
-                    text = "Add Link",
-                    fontFamily = acherusFeral,
-                    color = colorResource(R.color.green),
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = linkText,
-                        onValueChange = { linkText = it },
-                        label = {
-                            Text(
-                                "Текст для отображения",
-                                fontFamily = acherusFeral,
-                                color = Color.Black
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(R.color.green),
-                            unfocusedBorderColor = Color.Gray,
-                            disabledBorderColor = Color.Gray,
-                            cursorColor = Color.Black
-                        ),
-                        textStyle = TextStyle(
-                            color = Color.Black
-                        )
-                    )
-                    OutlinedTextField(
-                        value = link,
-                        onValueChange = { link = it },
-                        label = { Text("Ссылка", fontFamily = acherusFeral, color = Color.Black) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(R.color.green),
-                            unfocusedBorderColor = Color.Gray,
-                            disabledBorderColor = Color.Gray,
-                            cursorColor = Color.Black
-                        ),
-                        textStyle = TextStyle(
-                            color = Color.Black
-                        )
-                    )
-                }
-            },
-            containerColor = colorResource(id = R.color.light_green)
-        )
-
-    }
 
     FlowRow(
         modifier = modifier
@@ -459,28 +349,6 @@ fun EditorControls(
             Icon(
                 imageVector = Icons.Default.FormatSize,
                 contentDescription = "Subtitle Control",
-                tint = Color.White
-            )
-        }
-        ControlWrapper(
-            selected = textColorSelected,
-            onChangeClick = { textColorSelected = it },
-            onClick = onTextColorClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.FormatColorText,
-                contentDescription = "Text Color Control",
-                tint = Color.White
-            )
-        }
-        ControlWrapper(
-            selected = linkSelected,
-            onChangeClick = { linkSelected = it },
-            onClick = { showLinkDialog = true }
-        ) {
-            Icon(
-                imageVector = Icons.Default.AddLink,
-                contentDescription = "Link Control",
                 tint = Color.White
             )
         }
@@ -551,12 +419,3 @@ fun ControlWrapper(
         content()
     }
 }
-
-
-
-
-
-
-
-
-

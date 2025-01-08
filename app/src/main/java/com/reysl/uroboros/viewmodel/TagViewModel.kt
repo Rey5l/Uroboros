@@ -1,8 +1,8 @@
-package com.reysl.uroboros.data.db.tag_db
+package com.reysl.uroboros.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.reysl.uroboros.MainApplication
+import com.reysl.uroboros.components.MainApplication
 import com.reysl.uroboros.data.Tag
 
 

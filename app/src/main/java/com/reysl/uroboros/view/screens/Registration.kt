@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.screens
 
 import com.reysl.uroboros.ui.theme.UroborosTheme
 import android.util.Log
@@ -45,7 +45,9 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.reysl.uroboros.AuthViewModel.AuthState
+import com.reysl.uroboros.R
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
 
 @Composable
 fun Registration(navController: NavController, authViewModel: AuthViewModel) {

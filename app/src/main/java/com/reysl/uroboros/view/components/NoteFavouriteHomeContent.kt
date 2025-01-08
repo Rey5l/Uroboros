@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,7 +10,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import com.reysl.uroboros.viewmodel.NoteViewModel
 
 @Composable
 fun NoteFavouriteHomeContent(

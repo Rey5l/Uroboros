@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.components
 
 import androidx.room.TypeConverter
 import java.util.Date

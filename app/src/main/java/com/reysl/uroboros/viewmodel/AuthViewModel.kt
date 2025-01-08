@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,7 +1,5 @@
-package com.reysl.uroboros.pages
+package com.reysl.uroboros.view.pages
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -71,14 +69,14 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
-import com.reysl.uroboros.AddMaterialDialog
 import com.reysl.uroboros.R
-import com.reysl.uroboros.acherusFeral
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.formatTime
+import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.components.AddMaterialDialog
+import com.reysl.uroboros.view.components.formatTime
+import com.reysl.uroboros.view.screens.acherusFeral
+import com.reysl.uroboros.viewmodel.NoteViewModel
 import java.util.Date
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesPage(
     noteViewModel: NoteViewModel
@@ -120,7 +118,7 @@ fun NotesPage(
                             text = "New",
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 39.sp,
+                            fontSize = 30.sp,
                             modifier = Modifier.padding(start = 30.dp),
                             color = colorResource(id = R.color.white),
                             style = TextStyle(lineHeight = 50.sp)
@@ -130,7 +128,7 @@ fun NotesPage(
                             text = latestTitle,
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 39.sp,
+                            fontSize = 30.sp,
                             modifier = Modifier.padding(start = 30.dp),
                             color = colorResource(id = R.color.white),
                             style = TextStyle(lineHeight = 50.sp)
@@ -171,7 +169,7 @@ fun NotesPage(
             AddMaterialDialog(
                 onDismissRequest = { showDialog = false },
                 onAddMaterial = { title, description, tag ->
-                    noteViewModel.addNote(title, description, tag, state.toHtml(), context)
+                    noteViewModel.addNote(title, description, tag, state.toMarkdown(), context)
                     showDialog = false
                     latestTitle = title
                 }
@@ -182,7 +180,6 @@ fun NotesPage(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TextEditor(
     state: RichTextState

@@ -1,4 +1,4 @@
-package com.reysl.uroboros.pages
+package com.reysl.uroboros.view.pages
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -42,18 +42,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.AuthViewModel
-import com.reysl.uroboros.AuthViewModel.AuthState
-import com.reysl.uroboros.NoteFavouriteHomeContent
-import com.reysl.uroboros.NoteHomeContent
-import com.reysl.uroboros.NoteSearchHomeContent
-import com.reysl.uroboros.NoteTagSearchHomeContent
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
+import com.reysl.uroboros.view.components.NoteFavouriteHomeContent
+import com.reysl.uroboros.view.components.NoteHomeContent
+import com.reysl.uroboros.view.components.NoteSearchHomeContent
+import com.reysl.uroboros.view.components.NoteTagSearchHomeContent
 import com.reysl.uroboros.R
-import com.reysl.uroboros.TagHomeContent
-import com.reysl.uroboros.acherusFeral
+import com.reysl.uroboros.view.components.TagHomeContent
+import com.reysl.uroboros.view.screens.acherusFeral
 import com.reysl.uroboros.data.Tag
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.data.db.tag_db.TagViewModel
+import com.reysl.uroboros.viewmodel.NoteViewModel
+import com.reysl.uroboros.viewmodel.TagViewModel
 import com.reysl.uroboros.ui.theme.UroborosTheme
 
 @Composable

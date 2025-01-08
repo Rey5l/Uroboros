@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Uroboros.Splash"
-        android:name=".MainApplication"
+        android:name=".components.MainApplication"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -31,10 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver
-            android:name=".ReminderReceiver"
-            android:exported="false" />
 
         <service
             android:name="androidx.work.impl.background.systemjob.SystemJobService"

@@ -1,4 +1,4 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +18,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.reysl.uroboros.R
 import com.reysl.uroboros.data.Tag
-import com.reysl.uroboros.data.db.tag_db.TagViewModel
-import com.reysl.uroboros.pages.ItemCard
+import com.reysl.uroboros.view.pages.ItemCard
+import com.reysl.uroboros.viewmodel.TagViewModel
 
 @Composable
 fun TagHomeContent(

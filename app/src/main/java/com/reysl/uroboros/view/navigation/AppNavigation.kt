@@ -1,30 +1,41 @@
-package com.reysl.uroboros
+package com.reysl.uroboros.view.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
-import com.reysl.uroboros.data.db.tag_db.TagViewModel
-import com.reysl.uroboros.pages.HomePage
-import com.reysl.uroboros.pages.NotesPage
-import com.reysl.uroboros.view.NoteScreen
+import com.reysl.uroboros.view.pages.HomePage
+import com.reysl.uroboros.view.pages.NotesPage
+import com.reysl.uroboros.view.screens.Login
+import com.reysl.uroboros.view.screens.MainScreen
+import com.reysl.uroboros.view.screens.NoteScreen
+import com.reysl.uroboros.view.screens.Registration
+import com.reysl.uroboros.view.screens.StartScreen
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.NoteViewModel
+import com.reysl.uroboros.viewmodel.TagViewModel
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
+    noteViewModel: NoteViewModel,
 ) {
     val navController = rememberNavController()
     val showBottomBar = remember {
         mutableStateOf(true)
     }
+    val authState = authViewModel.authState.observeAsState()
+    val startDestination = if (authState.value is AuthViewModel.AuthState.Authenticated) {
+        "main_screen"
+    } else {
+        "start_screen"
+    }
 
-    NavHost(navController = navController, startDestination = "start_screen") {
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("start_screen") {
             showBottomBar.value = false
             StartScreen(navController)
@@ -39,7 +50,7 @@ fun AppNavigation(
         }
         composable("main_screen") {
             showBottomBar.value = true
-            MainScreen(modifier, navController, authViewModel)
+            MainScreen(navController, authViewModel)
         }
         composable("notes") {
             showBottomBar.value = true
@@ -52,26 +63,30 @@ fun AppNavigation(
             HomePage(
                 authViewModel = authViewModel,
                 navController = navController,
-                noteViewModel = NoteViewModel(),
+                noteViewModel = noteViewModel,
                 tagViewModel = TagViewModel()
             )
         }
-        composable("note_screen/{noteId}/{title}/{content}/{tag}") { backStackEntry ->
+        composable("note_screen/{noteId}/{noteTitle}/{noteContent}/{noteTag}") { backStackEntry ->
             showBottomBar.value = false
             val noteId = backStackEntry.arguments?.getString("noteId")?.toLongOrNull() ?: -1L
-            val noteTitle = Uri.decode(backStackEntry.arguments?.getString("title")) ?: "UnknownTitle"
+            val noteTitle =
+                Uri.decode(backStackEntry.arguments?.getString("noteTitle")) ?: "Неизвестное имя"
             val noteContent =
-                Uri.decode(backStackEntry.arguments?.getString("content")) ?: "No content available"
-            val noteTag = Uri.decode(backStackEntry.arguments?.getString("tag")) ?: "No content available"
+                Uri.decode(backStackEntry.arguments?.getString("noteContent"))
+                    ?: "Контент недоступен"
+            val noteTag = Uri.decode(backStackEntry.arguments?.getString("noteTag")) ?: "Метка"
             if (noteId != -1L) {
                 NoteScreen(
                     navController = navController,
-                    noteViewModel = NoteViewModel(),
+                    noteViewModel = noteViewModel,
                     noteId = noteId,
                     noteTitle = noteTitle,
                     noteContent = noteContent,
                     noteTag,
                 )
+            } else {
+                navController.navigate("main_screen")
             }
         }
     }

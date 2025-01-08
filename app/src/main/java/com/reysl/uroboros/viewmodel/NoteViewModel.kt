@@ -1,4 +1,4 @@
-package com.reysl.uroboros.data.db.note_db
+package com.reysl.uroboros.viewmodel
 
 import android.content.Context
 import android.widget.Toast
@@ -6,11 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.reysl.uroboros.MainApplication
-import com.reysl.uroboros.NoteRepository
+import androidx.work.WorkManager
+import com.reysl.uroboros.components.MainApplication
+import com.reysl.uroboros.data.repository.NoteRepository
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.data.Tag
-import com.reysl.uroboros.scheduleReminder
+import com.reysl.uroboros.notification.scheduleReminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,19 +52,16 @@ class NoteViewModel : ViewModel() {
                         time = Date.from(Instant.now())
                     )
                 )
+
                 val forgettingCurveIntervals = listOf(1L, 3L, 7L, 14L)
-                var cumulativeDelay = 0L
                 forgettingCurveIntervals.forEach { days ->
-                    cumulativeDelay += days
-                    scheduleReminder(context, noteId, title, markdownText, cumulativeDelay)
+                    scheduleReminder(context, noteId, title, markdownText, noteTag = tag, days)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Не получилось добавить материал", Toast.LENGTH_SHORT).show()
                 }
             }
-
-
         }
     }
 
@@ -77,6 +75,14 @@ class NoteViewModel : ViewModel() {
                 if (count == 0) {
                     tagDao.deleteTagByName(tag)
                 }
+
+                val workManager = WorkManager.getInstance(context)
+                workManager.cancelAllWorkByTag("Reminder_${note.id}")
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Материал успешно удалён", Toast.LENGTH_SHORT).show()
+                }
+
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Не получилось удалить материал", Toast.LENGTH_SHORT).show()

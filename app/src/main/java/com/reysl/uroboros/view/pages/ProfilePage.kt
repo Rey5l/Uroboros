@@ -1,4 +1,4 @@
-package com.reysl.uroboros.pages
+package com.reysl.uroboros.view.pages
 
 import android.content.Context
 import android.content.Intent
@@ -41,7 +41,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,13 +66,13 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
-import com.reysl.uroboros.AuthViewModel
-import com.reysl.uroboros.AuthViewModel.AuthState
 import com.reysl.uroboros.DataStoreManager
 import com.reysl.uroboros.R
-import com.reysl.uroboros.acherusFeral
-import com.reysl.uroboros.saveUsernameToFirebase
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.screens.acherusFeral
+import com.reysl.uroboros.view.screens.saveUsernameToFirebase
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -92,7 +91,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         mutableStateOf(savedName ?: "")
     }
 
-    var initialName by remember { mutableStateOf("user_001") }
+    val initialName by remember { mutableStateOf("user_001") }
 
     var oldPassword by remember {
         mutableStateOf("")
@@ -217,7 +216,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Row(
                 modifier = Modifier
@@ -226,7 +225,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { showInfoDialog = true }) {
+                IconButton(onClick = { showInfoDialog = !showInfoDialog }) {
                     Image(
                         painter = painterResource(id = R.drawable.info),
                         contentDescription = "About",
@@ -266,40 +265,50 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (isLoadingInitial) {
-                    CircularProgressIndicator(modifier = Modifier.size(120.dp))
-                } else {
-                    Box(
-                        contentAlignment = Alignment.BottomEnd,
-                        modifier = Modifier.size(120.dp)
-                    ) {
+                when {
+                    isLoadingInitial -> {
+                        CircularProgressIndicator(modifier = Modifier.size(120.dp))
+                    }
+                    else -> {
                         Box(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                                .border(2.dp, colorResource(id = R.color.green), CircleShape),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.BottomEnd,
+                            modifier = Modifier.size(120.dp)
                         ) {
-                            ProfileImage(imageUrl = avatarUri)
-                        }
-                        IconButton(
-                            onClick = { imagePickerLauncher.launch("image/*") },
-                            modifier = Modifier
-                                .size(24.dp)
-                                .background(Color.White, CircleShape)
-                                .border(1.dp, Color.Gray, CircleShape)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.camera),
-                                contentDescription = "Edit",
-                                tint = Color.Black,
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.Gray)
+                                    .border(2.dp, colorResource(id = R.color.green), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ProfileImage(imageUrl = avatarUri)
+                            }
+                            IconButton(
+                                onClick = { imagePickerLauncher.launch("image/*") },
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(Color.White, CircleShape)
+                                    .border(1.dp, Color.Gray, CircleShape)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.camera),
+                                    contentDescription = "Edit",
+                                    tint = Color.Black,
+                                )
+                            }
                         }
                     }
                 }
                 if (isLoadingImage) {
-                    CircularProgressIndicator(modifier = Modifier.size(120.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .background(Color(0xAA000000), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -324,7 +333,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 }
 
             }
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     text = "Change password",
@@ -529,18 +538,8 @@ fun InfoDialog(showDialog: Boolean, onDismiss: () -> Unit) {
                         url = "https://www.donationalerts.com/r/reysl"
                     )
                     InfoItem(
-                        icon = R.drawable.code,
-                        label = "Исходный код",
-                        url = "https://github.com/Rey5l/Uroboros"
-                    )
-                    InfoItem(
                         icon = R.drawable.telegram,
                         label = "Телеграм-канал",
-                        url = "https://t.me/reysldevblog"
-                    )
-                    InfoItem(
-                        icon = R.drawable.instruction,
-                        label = "Инструкция по использованию",
                         url = "https://t.me/reysldevblog"
                     )
                     InfoItem(
