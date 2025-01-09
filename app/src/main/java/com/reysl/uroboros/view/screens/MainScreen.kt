@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,9 +57,9 @@ fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
     }
 
     val navItemList = listOf(
-        NavItem("Notes", painterResource(id = R.drawable.notes), selectedIndex == 0),
-        NavItem("Home", painterResource(id = R.drawable.home2), selectedIndex == 1),
-        NavItem("Profile", painterResource(id = R.drawable.profile), selectedIndex == 2)
+        NavItem(stringResource(R.string.notes), painterResource(id = R.drawable.notes), selectedIndex == 0),
+        NavItem(stringResource(R.string.home), painterResource(id = R.drawable.home2), selectedIndex == 1),
+        NavItem(stringResource(R.string.profile), painterResource(id = R.drawable.profile), selectedIndex == 2)
     )
 
 

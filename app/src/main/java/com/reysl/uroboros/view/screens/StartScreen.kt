@@ -1,6 +1,5 @@
 package com.reysl.uroboros.view.screens
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.reysl.uroboros.R
+import com.reysl.uroboros.ui.theme.UroborosTheme
 
 @Composable
 fun StartScreen(navController: NavController) {
@@ -115,7 +115,7 @@ fun StartScreen(navController: NavController) {
                             .height(55.dp)
                     ) {
                         Text(
-                            "Login",
+                            stringResource(R.string.login),
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -133,7 +133,7 @@ fun StartScreen(navController: NavController) {
                             .height(55.dp)
                     ) {
                         Text(
-                            "Create a new account",
+                            stringResource(R.string.create_new_account),
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -155,7 +155,9 @@ private fun ThemedLogo() {
         Image(
             painter = painterResource(id = R.drawable.uroboros_logo_dark),
             contentDescription = "Logo",
-            modifier = Modifier.padding(end = 10.dp).padding(bottom = 10.dp)
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .padding(bottom = 10.dp)
         )
     } else {
         Image(

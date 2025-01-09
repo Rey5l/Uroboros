@@ -104,7 +104,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
             }
             Spacer(modifier = Modifier.height(58.dp))
             Text(
-                text = "Login",
+                text = stringResource(R.string.login),
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
@@ -124,14 +124,14 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
                 value = email,
                 onValueChange = { email = it },
                 label = {
-                    Text(text = "Введите почту")
+                    Text(text = stringResource(R.string.enter_email))
                 },
                 modifier = Modifier
                     .padding(start = 50.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Password",
+                text = stringResource(R.string.password),
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Light,
                 fontSize = 16.sp,
@@ -143,7 +143,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
                 value = password,
                 onValueChange = { password = it },
                 label = {
-                    Text(text = "Введите пароль")
+                    Text(text = stringResource(R.string.enter_password))
                 },
                 trailingIcon = {
                     IconButton(onClick = {isPasswordShow = !isPasswordShow}) {
@@ -171,7 +171,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
 
             ) {
                 Text(
-                    text = "У меня нет аккаунта",
+                    text = stringResource(R.string.dont_have_account),
                     modifier = Modifier.clickable { navController.navigate("registration") },
                     textAlign = TextAlign.Center,
                     fontFamily = acherusFeral,
@@ -196,15 +196,13 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
                         .height(55.dp)
                 ) {
                     Text(
-                        "Login",
+                        stringResource(R.string.login),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
                 }
             }
-
-
         }
     }
 
@@ -218,7 +216,9 @@ private fun ThemedLogo() {
         Image(
             painter = painterResource(id = R.drawable.uroboros_logo_dark),
             contentDescription = "Logo",
-            modifier = Modifier.padding(end = 10.dp).padding(bottom = 10.dp)
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .padding(bottom = 10.dp)
         )
     } else {
         Image(

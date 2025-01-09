@@ -51,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -318,7 +319,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = "Full Name",
+                        text = stringResource(R.string.username),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Light,
                         fontSize = 16.sp,
@@ -336,7 +337,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Change password",
+                    text = stringResource(R.string.change_password),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = acherusFeral,
@@ -349,7 +350,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = "Old password",
+                        text = stringResource(R.string.old_password),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Light,
                         fontSize = 16.sp,
@@ -385,7 +386,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             ) {
                 Column {
                     Text(
-                        text = "New password",
+                        text = stringResource(R.string.new_password),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Light,
                         fontSize = 16.sp,
@@ -451,7 +452,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                         .height(55.dp)
                 ) {
                     Text(
-                        text = "Сохранить",
+                        text = stringResource(R.string.save_password),
                         fontFamily = acherusFeral,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -460,10 +461,10 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 if (showSuccessDialog) {
                     AlertDialog(
                         onDismissRequest = { showSuccessDialog = false },
-                        title = { Text(text = "Успех!") },
+                        title = { Text(text = stringResource(R.string.success)) },
                         text = {
                             Text(
-                                text = "Пароль успешно изменен!"
+                                text = stringResource(R.string.password_was_change)
                             )
                         },
                         confirmButton = {
@@ -477,8 +478,8 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 if (showErrorDialog != null) {
                     AlertDialog(
                         onDismissRequest = { showErrorDialog = null },
-                        title = { Text(text = "Ошибка!") },
-                        text = { Text(text = "Не удалось изменить пароль") },
+                        title = { Text(text = stringResource(R.string.error)) },
+                        text = { Text(text = stringResource(R.string.error_changing_password)) },
                         confirmButton = {
                             Button(onClick = { showErrorDialog = null }) {
                                 Text(text = "ОК")
@@ -491,10 +492,10 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     AlertDialog(onDismissRequest = { showSuccessChangeNameDialog = false },
                         title = {
                             Text(
-                                text = "Успех!"
+                                text = stringResource(R.string.success)
                             )
                         },
-                        text = { Text(text = "Имя успешно изменено!") },
+                        text = { Text(text = stringResource(R.string.username_was_change)) },
                         confirmButton = {
                             Button(onClick = { showSuccessChangeNameDialog = false }) {
                                 Text(text = "OK")
@@ -506,8 +507,8 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 if (showErrorChangeNameDialog != null) {
                     AlertDialog(
                         onDismissRequest = { showErrorChangeNameDialog = null },
-                        title = { Text(text = "Ошибка!") },
-                        text = { Text(text = "Не получилось сменить имя") },
+                        title = { Text(text = stringResource(R.string.error)) },
+                        text = { Text(text = stringResource(R.string.error_changing_username)) },
                         confirmButton = {
                             Button(onClick = { showErrorChangeNameDialog = null }) {
                                 Text(text = "OK")
@@ -528,30 +529,30 @@ fun InfoDialog(showDialog: Boolean, onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
-                Text("Информация")
+                Text(stringResource(R.string.information))
             },
             text = {
                 Column {
                     InfoItem(
                         icon = R.drawable.donation,
-                        label = "Поддержать автора",
+                        label = stringResource(R.string.support_the_author),
                         url = "https://www.donationalerts.com/r/reysl"
                     )
                     InfoItem(
                         icon = R.drawable.telegram,
-                        label = "Телеграм-канал",
+                        label = stringResource(R.string.telegram_channel),
                         url = "https://t.me/reysldevblog"
                     )
                     InfoItem(
                         icon = R.drawable.help,
-                        label = "Обратная связь",
+                        label = stringResource(R.string.feedback),
                         email = "Rey5l@yandex.ru"
                     )
                 }
             },
             confirmButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Закрыть", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(stringResource(R.string.close), color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         )
@@ -595,7 +596,7 @@ fun InfoItem(icon: Int, label: String, url: String? = null, email: String? = nul
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        if (label == "Поддержать автора") {
+        if (label == stringResource(R.string.support_the_author)) {
             Text(
                 text = label,
                 color = colorResource(R.color.orange_donation),
@@ -619,14 +620,14 @@ fun SignoutConfirmationDialog(
             onDismissRequest = onDismiss,
             title = {
                 Text(
-                    text = "Выйти из аккаунта",
+                    text = stringResource(R.string.exit),
                     fontFamily = acherusFeral,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "Вы уверены, что хотите выйти из аккаунта?",
+                    text = stringResource(R.string.confirm_exit),
                     fontFamily = acherusFeral,
                     fontWeight = FontWeight.Light,
                     fontSize = 16.sp
@@ -638,7 +639,7 @@ fun SignoutConfirmationDialog(
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.green))
                 ) {
                     Text(
-                        text = "Выйти",
+                        text = stringResource(R.string.exit_2),
                         color = colorResource(id = R.color.card_color),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold
@@ -650,7 +651,7 @@ fun SignoutConfirmationDialog(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.card_color))
                 ) {
-                    Text(text = "Отмена", color = colorResource(id = R.color.green))
+                    Text(text = stringResource(R.string.cancel), color = colorResource(id = R.color.green))
                 }
             }
         )
@@ -707,12 +708,6 @@ fun saveAvatarUrlToDatabase(avatarUrl: String) {
         )
 
         userRef.set(userData, SetOptions.merge())
-            .addOnSuccessListener {
-                Log.d("Firestore", "Avatar URL updated successfully.")
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "Error updating avatar URL", e)
-            }
     }
 }
 

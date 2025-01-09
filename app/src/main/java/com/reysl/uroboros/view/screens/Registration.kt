@@ -1,7 +1,5 @@
 package com.reysl.uroboros.view.screens
 
-import com.reysl.uroboros.ui.theme.UroborosTheme
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.reysl.uroboros.R
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import com.reysl.uroboros.viewmodel.AuthViewModel
 import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
 
@@ -117,7 +116,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             }
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Sign Up",
+                text = stringResource(R.string.registration),
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
@@ -126,7 +125,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Username",
+                text = stringResource(R.string.username),
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Light,
                 fontSize = 16.sp,
@@ -136,7 +135,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text(text = "Введите ваше имя") },
+                label = { Text(text = stringResource(R.string.enter_username)) },
                 modifier = Modifier.padding(start = 50.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -152,14 +151,14 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                 value = email,
                 onValueChange = { email = it },
                 label = {
-                    Text(text = "Введите почту")
+                    Text(text = stringResource(R.string.enter_email))
                 },
                 modifier = Modifier
                     .padding(start = 50.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Password",
+                text = stringResource(R.string.password),
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Light,
                 fontSize = 16.sp,
@@ -170,7 +169,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                 value = password,
                 onValueChange = { password = it },
                 label = {
-                    Text(text = "Введите пароль")
+                    Text(text = stringResource(R.string.enter_password))
                 },
                 trailingIcon = {
                     IconButton(onClick = { isPasswordShow = !isPasswordShow }) {
@@ -208,7 +207,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                         .height(55.dp)
                 ) {
                     Text(
-                        "Sign Up",
+                        stringResource(R.string.create_new_account),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -232,7 +231,9 @@ private fun ThemedLogo() {
         Image(
             painter = painterResource(id = R.drawable.uroboros_logo_dark),
             contentDescription = "Logo",
-            modifier = Modifier.padding(end = 10.dp).padding(bottom = 10.dp)
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .padding(bottom = 10.dp)
         )
     } else {
         Image(
@@ -251,10 +252,4 @@ fun saveUsernameToFirebase(username: String) {
     val userData = hashMapOf("username" to username)
 
     userRef.set(userData, SetOptions.merge())
-        .addOnSuccessListener {
-            Log.d("FirebaseFirestore", "Имя успешно добавлено в базу данных")
-        }
-        .addOnFailureListener { e ->
-            Log.e("FirebaseFirestoreError", "Не получилось добавить имя в базу данных", e)
-        }
 }

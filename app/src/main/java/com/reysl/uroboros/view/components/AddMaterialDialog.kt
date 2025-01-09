@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,7 @@ fun AddMaterialDialog(
                     )
                 ) {
                     Text(
-                        "Добавить",
+                        stringResource(R.string.add),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = acherusFeral
@@ -65,7 +66,7 @@ fun AddMaterialDialog(
                     )
                 ) {
                     Text(
-                        "Отмена",
+                        stringResource(R.string.cancel),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = acherusFeral
@@ -74,7 +75,7 @@ fun AddMaterialDialog(
             },
             title = {
                 Text(
-                    text = "Добавить материал",
+                    text = stringResource(R.string.add_material),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = acherusFeral,
@@ -92,7 +93,7 @@ fun AddMaterialDialog(
                         },
                         label = {
                             Text(
-                                "Название",
+                                text = stringResource(R.string.material_name),
                                 fontFamily = acherusFeral,
                                 color = Color.Black
                             )
@@ -122,7 +123,7 @@ fun AddMaterialDialog(
                         onValueChange = { description = it },
                         label = {
                             Text(
-                                "Описание",
+                                stringResource(R.string.material_description),
                                 fontFamily = acherusFeral,
                                 color = Color.Black
                             )
@@ -144,7 +145,7 @@ fun AddMaterialDialog(
                     OutlinedTextField(
                         value = tag,
                         onValueChange = { tag = it },
-                        label = { Text("Метка", fontFamily = acherusFeral, color = Color.Black) },
+                        label = { Text(stringResource(R.string.material_tag), fontFamily = acherusFeral, color = Color.Black) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),

@@ -38,23 +38,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.reysl.uroboros.viewmodel.AuthViewModel
-import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
+import com.reysl.uroboros.R
+import com.reysl.uroboros.data.Tag
+import com.reysl.uroboros.ui.theme.UroborosTheme
 import com.reysl.uroboros.view.components.NoteFavouriteHomeContent
 import com.reysl.uroboros.view.components.NoteHomeContent
 import com.reysl.uroboros.view.components.NoteSearchHomeContent
 import com.reysl.uroboros.view.components.NoteTagSearchHomeContent
-import com.reysl.uroboros.R
 import com.reysl.uroboros.view.components.TagHomeContent
 import com.reysl.uroboros.view.screens.acherusFeral
-import com.reysl.uroboros.data.Tag
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
 import com.reysl.uroboros.viewmodel.NoteViewModel
 import com.reysl.uroboros.viewmodel.TagViewModel
-import com.reysl.uroboros.ui.theme.UroborosTheme
 
 @Composable
 fun HomePage(
@@ -139,7 +140,7 @@ fun HomePage(
                         }
                     }
                     Text(
-                        text = "Метки",
+                        text = stringResource(R.string.tags),
                         modifier = Modifier.padding(start = 43.dp),
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
