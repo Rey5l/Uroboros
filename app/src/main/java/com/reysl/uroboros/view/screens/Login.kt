@@ -96,6 +96,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
                         fontSize = 35.sp,
+                        color = MaterialTheme.colorScheme.scrim,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     )
@@ -105,6 +106,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
             Spacer(modifier = Modifier.height(58.dp))
             Text(
                 text = stringResource(R.string.login),
+                color = MaterialTheme.colorScheme.scrim,
                 fontFamily = acherusFeral,
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
@@ -172,6 +174,7 @@ fun Login(navController: NavController, authViewModel: AuthViewModel) {
             ) {
                 Text(
                     text = stringResource(R.string.dont_have_account),
+                    color = MaterialTheme.colorScheme.scrim,
                     modifier = Modifier.clickable { navController.navigate("registration") },
                     textAlign = TextAlign.Center,
                     fontFamily = acherusFeral,

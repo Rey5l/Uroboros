@@ -91,7 +91,11 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                 onClick = { navController.navigate("login") },
                 modifier = Modifier.padding(top = 30.dp)
             ) {
-                Icon(painter = painterResource(id = R.drawable.back), contentDescription = "Back")
+                Icon(
+                    painter = painterResource(id = R.drawable.back),
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.scrim
+                )
             }
             Box(
                 modifier = Modifier
@@ -105,6 +109,7 @@ fun Registration(navController: NavController, authViewModel: AuthViewModel) {
                     ThemedLogo()
                     Text(
                         text = stringResource(R.string.uroboros),
+                        color = MaterialTheme.colorScheme.scrim,
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
                         fontSize = 35.sp,
