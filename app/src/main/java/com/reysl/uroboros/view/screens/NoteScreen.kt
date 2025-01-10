@@ -96,7 +96,7 @@ fun NoteScreen(
                         text = noteTitle,
                         fontFamily = acherusFeral,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         color = colorResource(id = R.color.white)
                     )
                 },
