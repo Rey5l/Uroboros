@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Uroboros</string>
+    <string name="uroboros">Uroboros</string>
+    <string name="main_text">Add the material you want to remember, and Uroboros will remind you of it based on the method of spaced repetition.</string>
+    <string name="description_text_notification_channel">Reminder to review materials</string>
+    <string name="create_new_account">Create an Account</string>
+    <string name="login">Login</string>
+    <string name="notes">Notes</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="registration">Registration</string>
+    <string name="username">Username</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="enter_username">Enter your name</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="Login">Login</string>
+    <string name="password">Password</string>
+    <string name="dont_have_account">I don’t have an account</string>
+    <string name="new_material">New</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_material">Add Material</string>
+    <string name="material_name">Title</string>
+    <string name="material_description">Description</string>
+    <string name="material_tag">Tag</string>
+    <string name="tags">Tags</string>
+    <string name="change_password">Change Password</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="save_password">Save</string>
+    <string name="password_was_change">Password successfully changed!</string>
+    <string name="success">Success!</string>
+    <string name="error">Error!</string>
+    <string name="error_changing_password">Failed to change the password</string>
+    <string name="username_was_change">Username successfully changed!</string>
+    <string name="error_changing_username">Failed to change the username</string>
+    <string name="information">Information</string>
+    <string name="support_the_author">Support the Author</string>
+    <string name="telegram_channel">Telegram Channel</string>
+    <string name="feedback">Feedback</string>
+    <string name="close">Close</string>
+    <string name="exit">Logout</string>
+    <string name="confirm_exit">Are you sure you want to log out?</string>
+    <string name="exit_2">Log Out</string>
+</resources>

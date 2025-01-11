@@ -3,7 +3,7 @@ package com.reysl.uroboros.data.db.note_db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.reysl.uroboros.Converters
+import com.reysl.uroboros.components.Converters
 import com.reysl.uroboros.data.Note
 
 @Database(entities = [Note::class], version = 8)

@@ -1,58 +1,59 @@
 package com.reysl.uroboros
 
-import android.content.Intent
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
-import com.reysl.uroboros.data.db.note_db.NoteViewModel
+import com.reysl.uroboros.notification.checkAndRequestNotificationPermission
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.navigation.AppNavigation
+import com.reysl.uroboros.viewmodel.AuthViewModel
+import com.reysl.uroboros.viewmodel.NoteViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkAndRequestNotificationPermission(this)
         FirebaseApp.initializeApp(this)
-        enableEdgeToEdge()
+        createNotificationChannel()
+
+
         val authViewModel: AuthViewModel by viewModels()
         val noteViewModel: NoteViewModel by viewModels()
+
         setContent {
-            val navController = rememberNavController()
-            val startDestination = handleIntent(intent)
 
             UroborosTheme {
-                Scaffold { innerPadding ->
-                    AppNavigation(
-                        modifier = Modifier.padding(innerPadding),
-                        authViewModel = authViewModel,
-                    )
-                }
+                AppNavigation(
+                    authViewModel = authViewModel,
+                    noteViewModel = noteViewModel,
+                )
             }
 
         }
     }
 
-    private fun handleIntent(intent: Intent?): String {
-        return if (intent?.action == "OPEN_NOTE") {
-            val noteId = intent.getLongExtra("note_id", -1L)
-            val noteTitle = intent.getStringExtra("note_title") ?: "Unknown title"
-            val noteContent = intent.getStringExtra("note_content") ?: "No content available"
-            val noteTag = intent.getStringExtra("note_tag") ?: "No tag available"
-            if (noteId != -1L) {
-                "note_screen/$noteId/$noteTitle/$noteContent/$noteTag"
-            } else {
-                "main_screen"
+    private fun createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channelId = "ReminderChannel"
+            val descriptionText = getString(R.string.description_text_notification_channel)
+            val channel = NotificationChannel(
+                channelId,
+                "Уведомления для повторения материала",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = descriptionText
             }
-        } else {
-            "main_screen"
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
+
 }
 
 
