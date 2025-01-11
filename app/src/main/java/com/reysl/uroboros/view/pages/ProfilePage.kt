@@ -605,7 +605,6 @@ fun InfoItem(icon: Int, label: String, url: String? = null, email: String? = nul
         } else {
             Text(text = label)
         }
-
     }
 }
 
