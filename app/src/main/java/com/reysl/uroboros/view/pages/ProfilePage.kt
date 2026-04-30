@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -70,16 +72,18 @@ import com.google.firebase.storage.FirebaseStorage
 import com.reysl.uroboros.DataStoreManager
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.view.components.StatisticsWidget
 import com.reysl.uroboros.view.screens.acherusFeral
 import com.reysl.uroboros.view.screens.saveUsernameToFirebase
 import com.reysl.uroboros.viewmodel.AuthViewModel
 import com.reysl.uroboros.viewmodel.AuthViewModel.AuthState
+import com.reysl.uroboros.viewmodel.NoteViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
+fun ProfilePage(authViewModel: AuthViewModel, navController: NavController, noteViewModel: NoteViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
@@ -218,6 +222,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier
@@ -312,6 +317,8 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
+            StatisticsWidget(noteViewModel = noteViewModel)
             Spacer(modifier = Modifier.height(20.dp))
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -518,7 +525,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController) {
                 }
             }
 
-
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }

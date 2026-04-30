@@ -1,5 +1,6 @@
 package com.reysl.uroboros.view.pages
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -108,24 +109,27 @@ fun HomePage(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        ThemedLogo()
+                        ThemedLogo(isSearch)
                         if (isSearch) {
                             OutlinedTextField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
                                 trailingIcon = {
-                                    IconButton(onClick = {
-                                        isSearch = false
-                                        searchQuery = ""
-                                    }) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.search_icon),
-                                            contentDescription = "Search",
-                                            modifier = Modifier.size(35.dp),
-                                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                                        )
+                                    AnimatedVisibility(isSearch) {
+                                        IconButton(onClick = {
+                                            isSearch = false
+                                            searchQuery = ""
+                                        }) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.search_icon),
+                                                contentDescription = "Search",
+                                                modifier = Modifier.size(35.dp),
+                                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                                            )
+                                        }
                                     }
-                                }
+                                },
+                                modifier = Modifier.fillMaxWidth()
                             )
                         } else {
                             IconButton(onClick = { isSearch = true }) {
@@ -196,23 +200,28 @@ fun HomePage(
 
 
 @Composable
-private fun ThemedLogo() {
+private fun ThemedLogo(
+    isSearch: Boolean
+) {
     val isDark = isSystemInDarkTheme()
 
-    if (isDark) {
-        Image(
-            painter = painterResource(id = R.drawable.uroboros_logo_dark),
-            contentDescription = "Logo",
-            modifier = Modifier
-                .padding(end = 10.dp, bottom = 10.dp, start = 13.dp)
-        )
-    } else {
-        Image(
-            painter = painterResource(id = R.drawable.uroboros_logo),
-            contentDescription = "Logo",
-            modifier = Modifier.size(85.dp)
-        )
+    if (!isSearch) {
+        if (isDark) {
+            Image(
+                painter = painterResource(id = R.drawable.uroboros_logo_dark),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .padding(end = 10.dp, bottom = 10.dp, start = 13.dp)
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.uroboros_logo),
+                contentDescription = "Logo",
+                modifier = Modifier.size(85.dp)
+            )
+        }
     }
+
 }
 
 

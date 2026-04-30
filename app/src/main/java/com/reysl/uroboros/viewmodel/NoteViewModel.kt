@@ -27,6 +27,10 @@ class NoteViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     val noteList: LiveData<List<Note>>
+    val totalNotesCount: LiveData<Int>
+    val favouriteNotesCount: LiveData<Int>
+    val uniqueTagsCount: LiveData<Int>
+    val recentNotesCount: LiveData<Int>
 
     init {
         val noteDao = noteDao
@@ -36,6 +40,13 @@ class NoteViewModel : ViewModel() {
         noteList.observeForever {
             _isLoading.value = false
         }
+
+        totalNotesCount = noteDao.getTotalNotesCount()
+        favouriteNotesCount = noteDao.getFavouriteNotesCount()
+        uniqueTagsCount = noteDao.getUniqueTagsCount()
+
+        val sevenDaysAgo = Date.from(Instant.now().minusSeconds(7 * 24 * 60 * 60))
+        recentNotesCount = noteDao.getNotesCountSince(sevenDaysAgo.time)
     }
 
     fun addNote(title: String, description: String, tag: String, markdownText: String, context: Context) {

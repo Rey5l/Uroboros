@@ -36,4 +36,24 @@ interface NoteDao {
 
     @Query("SELECT * FROM Note WHERE isFavourite = :isFavourite")
     fun getFavouriteNotes(isFavourite: Boolean): LiveData<List<Note>>
+
+    @Query("SELECT COUNT(*) FROM Note")
+    fun getTotalNotesCount(): LiveData<Int>
+
+    @Query("SELECT COUNT(*) FROM Note WHERE isFavourite = 1")
+    fun getFavouriteNotesCount(): LiveData<Int>
+
+    @Query("SELECT COUNT(DISTINCT tag) FROM Note")
+    fun getUniqueTagsCount(): LiveData<Int>
+
+    @Query("SELECT COUNT(*) FROM Note WHERE time >= :startDate")
+    fun getNotesCountSince(startDate: Long): LiveData<Int>
+
+    @Query("SELECT tag, COUNT(*) as count FROM Note GROUP BY tag ORDER BY count DESC LIMIT 3")
+    fun getTopTags(): LiveData<List<TagCount>>
 }
+
+data class TagCount(
+    val tag: String,
+    val count: Int
+)

@@ -32,7 +32,7 @@ import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
 import com.reysl.uroboros.view.navigation.NavItem
-import com.reysl.uroboros.view.pages.HomePage
+import com.reysl.uroboros.view.pages.home_page.HomePage
 import com.reysl.uroboros.view.pages.NotesPage
 import com.reysl.uroboros.view.pages.ProfilePage
 import com.reysl.uroboros.viewmodel.AuthViewModel
@@ -118,7 +118,7 @@ fun ContentScreen(modifier: Modifier = Modifier, index: Int, navController: NavC
     when (index) {
         0 -> NotesPage(noteViewModel = NoteViewModel())
         1 -> HomePage(authViewModel, navController, noteViewModel = NoteViewModel(), tagViewModel = TagViewModel())
-        2 -> ProfilePage(authViewModel, navController)
+        2 -> ProfilePage(authViewModel, navController, noteViewModel = NoteViewModel())
     }
 }
 

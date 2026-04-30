@@ -42,4 +42,8 @@
     <string name="exit">Выйти из аккаунта</string>
     <string name="confirm_exit">Вы уверены, что хотите выйти из аккаунта?</string>
     <string name="exit_2">Выйти</string>
+    <string name="statistics">Статистика</string>
+    <string name="total_notes">Всего заметок</string>
+    <string name="favourite">Избранных</string>
+    <string name="last_7_days">За 7 дней</string>
 </resources>
