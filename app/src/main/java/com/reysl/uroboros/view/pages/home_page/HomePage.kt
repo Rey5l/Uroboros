@@ -1,6 +1,5 @@
-package com.reysl.uroboros.view.pages
+package com.reysl.uroboros.view.pages.home_page
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,9 +20,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -110,39 +106,13 @@ fun HomePage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         ThemedLogo(isSearch)
-                        if (isSearch) {
-                            OutlinedTextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                trailingIcon = {
-                                    AnimatedVisibility(isSearch) {
-                                        IconButton(onClick = {
-                                            isSearch = false
-                                            searchQuery = ""
-                                        }) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.search_icon),
-                                                contentDescription = "Search",
-                                                modifier = Modifier.size(35.dp),
-                                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-                                            )
-                                        }
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else {
-                            IconButton(onClick = { isSearch = true }) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.search_icon),
-                                    contentDescription = "Search",
-                                    modifier = Modifier
-                                        .size(35.dp),
-                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
-                                )
-                            }
-                        }
+                        HomeSearchBar(
+                            isSearch = isSearch,
+                            searchQuery = searchQuery,
+                            onSearchChange = { searchQuery = it },
+                            onToggleSearch = { isSearch = it })
                     }
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = stringResource(R.string.tags),
                         modifier = Modifier.padding(start = 43.dp),
@@ -191,7 +161,6 @@ fun HomePage(
                             navController = navController
                         )
                     }
-
                 }
             }
         )
@@ -210,8 +179,6 @@ private fun ThemedLogo(
             Image(
                 painter = painterResource(id = R.drawable.uroboros_logo_dark),
                 contentDescription = "Logo",
-                modifier = Modifier
-                    .padding(end = 10.dp, bottom = 10.dp, start = 13.dp)
             )
         } else {
             Image(
@@ -221,7 +188,6 @@ private fun ThemedLogo(
             )
         }
     }
-
 }
 
 

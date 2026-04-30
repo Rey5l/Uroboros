@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.reysl.uroboros.view.pages.HomePage
+import com.reysl.uroboros.view.pages.home_page.HomePage
 import com.reysl.uroboros.view.pages.NotesPage
 import com.reysl.uroboros.view.screens.Login
 import com.reysl.uroboros.view.screens.MainScreen

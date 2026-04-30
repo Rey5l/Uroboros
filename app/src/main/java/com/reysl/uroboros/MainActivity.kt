@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.google.firebase.FirebaseApp
 import com.reysl.uroboros.notification.checkAndRequestNotificationPermission
@@ -17,6 +18,7 @@ import com.reysl.uroboros.viewmodel.NoteViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         checkAndRequestNotificationPermission(this)
         FirebaseApp.initializeApp(this)
         createNotificationChannel()

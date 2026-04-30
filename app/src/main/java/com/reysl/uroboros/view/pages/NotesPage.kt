@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -242,6 +243,7 @@ fun TextEditor(
         }
 
         Scaffold(
+            modifier = Modifier.imePadding(),
             bottomBar = {
                 RichTextToolbar(
                     onBoldClick = {
@@ -337,6 +339,8 @@ fun TextEditor(
                     colors = RichTextEditorDefaults.richTextEditorColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         cursorColor = colorResource(R.color.green),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
                         selectionColors = TextSelectionColors(
                             handleColor = colorResource(R.color.green),
                             backgroundColor = colorResource(if (isDark) R.color.green else R.color.card_color)

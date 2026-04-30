@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.utils.performHapticTick
 import com.reysl.uroboros.view.screens.acherusFeral
 
 @Composable
@@ -36,6 +38,7 @@ fun AddMaterialDialog(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var tag by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     UroborosTheme {
         AlertDialog(
@@ -43,6 +46,7 @@ fun AddMaterialDialog(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        performHapticTick(context)
                         onAddMaterial(title, description, tag)
                         onDismissRequest()
                     },

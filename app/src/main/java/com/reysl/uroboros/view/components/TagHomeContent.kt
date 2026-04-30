@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.reysl.uroboros.R
 import com.reysl.uroboros.data.Tag
-import com.reysl.uroboros.view.pages.ItemCard
+import com.reysl.uroboros.view.pages.home_page.ItemCard
 import com.reysl.uroboros.viewmodel.TagViewModel
 
 @Composable

@@ -525,7 +525,7 @@ fun ProfilePage(authViewModel: AuthViewModel, navController: NavController, note
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
@@ -44,6 +45,9 @@ import com.reysl.uroboros.viewmodel.TagViewModel
 fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     val authState = authViewModel.authState.observeAsState()
+
+    val noteViewModel: NoteViewModel = viewModel()
+    val tagViewModel: TagViewModel = viewModel()
 
     LaunchedEffect(authState.value) {
         when(authState.value) {
@@ -108,17 +112,31 @@ fun MainScreen(navController: NavController, authViewModel: AuthViewModel) {
                 }
             }
         ) { innerPadding ->
-            ContentScreen(modifier = Modifier.padding(innerPadding), index = selectedIndex, navController, authViewModel)
+            ContentScreen(
+                modifier = Modifier.padding(innerPadding),
+                index = selectedIndex,
+                navController = navController,
+                authViewModel = authViewModel,
+                noteViewModel = noteViewModel,
+                tagViewModel = tagViewModel
+            )
         }
     }
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier = Modifier, index: Int, navController: NavController, authViewModel: AuthViewModel) {
+fun ContentScreen(
+    modifier: Modifier = Modifier,
+    index: Int,
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    noteViewModel: NoteViewModel,
+    tagViewModel: TagViewModel
+) {
     when (index) {
-        0 -> NotesPage(noteViewModel = NoteViewModel())
-        1 -> HomePage(authViewModel, navController, noteViewModel = NoteViewModel(), tagViewModel = TagViewModel())
-        2 -> ProfilePage(authViewModel, navController, noteViewModel = NoteViewModel())
+        0 -> NotesPage(noteViewModel = noteViewModel)
+        1 -> HomePage(authViewModel, navController, noteViewModel = noteViewModel, tagViewModel = tagViewModel)
+        2 -> ProfilePage(authViewModel, navController, noteViewModel = noteViewModel)
     }
 }
 

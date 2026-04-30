@@ -2,6 +2,7 @@ package com.reysl.uroboros.view.components
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -42,6 +43,8 @@ import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.utils.performHapticClick
+import com.reysl.uroboros.utils.performHapticTick
 import com.reysl.uroboros.view.screens.acherusFeral
 import com.reysl.uroboros.viewmodel.NoteViewModel
 import java.text.SimpleDateFormat
@@ -71,8 +74,14 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                         )
                     } catch (e: Exception) {
                         Toast
-                            .makeText(context, "Не получилось открыть материал", Toast.LENGTH_SHORT)
+                            .makeText(
+                                context,
+                                "Не получилось открыть материал!",
+                                Toast.LENGTH_SHORT
+                            )
                             .show()
+                        performHapticClick(context)
+                        Log.e("NoteListItem", e.message.toString())
                     }
                 },
             elevation = CardDefaults.cardElevation(2.dp),
@@ -92,6 +101,7 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(onClick = {
+                            performHapticClick(context)
                             showDeleteConfirmationDialog = true
                         }) {
                             Icon(
@@ -211,6 +221,8 @@ fun DeleteConfirmationDialog(
     onDeleteConfirmed: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -230,7 +242,10 @@ fun DeleteConfirmationDialog(
         },
         confirmButton = {
             Button(
-                onClick = onDeleteConfirmed, colors = ButtonDefaults.buttonColors(
+                onClick = {
+                    onDeleteConfirmed()
+                    performHapticTick(context)
+                }, colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.green)
                 )
             ) {
