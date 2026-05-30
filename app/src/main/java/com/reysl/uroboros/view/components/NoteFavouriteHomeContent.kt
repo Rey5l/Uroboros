@@ -7,9 +7,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.reysl.uroboros.utils.MaterialSort
+import com.reysl.uroboros.utils.sortMaterials
 import com.reysl.uroboros.viewmodel.NoteViewModel
 
 @Composable
@@ -17,9 +20,11 @@ fun NoteFavouriteHomeContent(
     modifier: Modifier,
     noteViewModel: NoteViewModel,
     navController: NavController,
-    isFavourite: Boolean
+    isFavourite: Boolean,
+    sort: MaterialSort = MaterialSort.NEWEST,
 ) {
     val notes by noteViewModel.getFavouriteMaterials(isFavourite).observeAsState(listOf())
+    val sortedNotes = remember(notes, sort) { notes.sortMaterials(sort) }
     LazyColumn(
         contentPadding = PaddingValues(
             horizontal = 16.dp,
@@ -29,10 +34,14 @@ fun NoteFavouriteHomeContent(
             .fillMaxHeight()
     ) {
         items(
-            items = notes,
-            itemContent = {
-                NoteListItem(note = it, viewModel = noteViewModel, navController)
-            }
-        )
+            items = sortedNotes,
+            key = { it.id },
+        ) { note ->
+            NoteListItem(
+                note = note,
+                viewModel = noteViewModel,
+                navController = navController,
+            )
+        }
     }
 }

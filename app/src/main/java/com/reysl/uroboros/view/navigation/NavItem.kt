@@ -1,9 +1,11 @@
 package com.reysl.uroboros.view.navigation
 
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavItem(
-    var label: String,
-    val icon: Painter,
-    val isSelected: Boolean
+    val label: String,
+    val icon: Painter?,
+    val isSelected: Boolean,
+    val vectorIcon: ImageVector? = null,
 )

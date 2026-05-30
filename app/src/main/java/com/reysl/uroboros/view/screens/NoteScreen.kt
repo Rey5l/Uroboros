@@ -1,16 +1,28 @@
 package com.reysl.uroboros.view.screens
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.width
+import com.reysl.uroboros.ui.theme.appButtonOnGreen
+import com.reysl.uroboros.ui.theme.appChipSelectedText
+import com.reysl.uroboros.ui.theme.appGreen
+import com.reysl.uroboros.ui.theme.appLightGreenSurface
+import com.reysl.uroboros.ui.theme.appOnGreenIcon
+import com.reysl.uroboros.ui.theme.appOnGreenTopBar
+import com.reysl.uroboros.ui.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -28,7 +40,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,22 +50,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
-import com.reysl.uroboros.view.components.RichTextToolbar
+import com.reysl.uroboros.ui.theme.acherusFeral
+import com.reysl.uroboros.utils.KnowledgeCheckGenerator
+import com.reysl.uroboros.utils.KnowledgeCheckSegment
+import com.reysl.uroboros.utils.MarkdownEditorController
+import com.reysl.uroboros.utils.MarkdownEditorState
+import com.reysl.uroboros.utils.MarkdownStorage
+import com.reysl.uroboros.utils.contentTransitionSpec
+import com.reysl.uroboros.view.components.ConnectedMarkdownToolbar
+import com.reysl.uroboros.view.components.KnowledgeCheckText
+import com.reysl.uroboros.view.components.MarkdownEditor
+import com.reysl.uroboros.view.components.MarkdownPreview
 import com.reysl.uroboros.viewmodel.NoteViewModel
 import kotlinx.coroutines.launch
 
@@ -69,63 +83,46 @@ fun NoteScreen(
     noteTag: String,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val state = remember { RichTextState().apply { setMarkdown(noteContent) } }
-
-    var boldSelected by rememberSaveable { mutableStateOf(false) }
-    var italicSelected by rememberSaveable { mutableStateOf(false) }
-    var underlineSelected by rememberSaveable { mutableStateOf(false) }
-    var strikethroughSelected by rememberSaveable { mutableStateOf(false) }
-    var titleSelected by rememberSaveable { mutableStateOf(false) }
-    var subtitleSelected by rememberSaveable { mutableStateOf(false) }
-    var textColorSelected by rememberSaveable { mutableStateOf(false) }
-    var linkSelected by rememberSaveable { mutableStateOf(false) }
-    var codeSelected by rememberSaveable { mutableStateOf(false) }
-    var quoteSelected by rememberSaveable { mutableStateOf(false) }
-    var bulletListSelected by rememberSaveable { mutableStateOf(false) }
-    var numberListSelected by rememberSaveable { mutableStateOf(false) }
-    var alignmentSelected by rememberSaveable { mutableIntStateOf(0) }
+    val state = remember(noteContent) {
+        MarkdownEditorState(MarkdownStorage.normalize(noteContent))
+    }
 
     var showLinkDialog by remember { mutableStateOf(false) }
     var linkText by remember { mutableStateOf("") }
     var link by remember { mutableStateOf("") }
 
-    val titleSize = MaterialTheme.typography.titleLarge.fontSize
-    val subtitleSize = MaterialTheme.typography.titleMedium.fontSize
+    var isKnowledgeCheckMode by rememberSaveable { mutableStateOf(false) }
+    var isReadMode by rememberSaveable { mutableStateOf(false) }
+    var knowledgeCheckSegments by remember { mutableStateOf<List<KnowledgeCheckSegment>>(emptyList()) }
+    var revealedWordIds by remember { mutableStateOf(setOf<Int>()) }
 
     UroborosTheme {
         if (showLinkDialog) {
             AlertDialog(
-                onDismissRequest = {
-                    showLinkDialog = false
-                    linkSelected = false
-                },
+                onDismissRequest = { showLinkDialog = false },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            state.addLink(text = linkText, url = link)
+                            MarkdownEditorController.insertLink(state, linkText, link)
                             showLinkDialog = false
-                            linkSelected = false
                             linkText = ""
                             link = ""
                         },
-                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
+                        colors = ButtonDefaults.textButtonColors(contentColor = appGreen())
                     ) {
                         Text("Confirm", fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = acherusFeral)
                     }
                 },
                 dismissButton = {
                     TextButton(
-                        onClick = {
-                            showLinkDialog = false
-                            linkSelected = false
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
+                        onClick = { showLinkDialog = false },
+                        colors = ButtonDefaults.textButtonColors(contentColor = appGreen())
                     ) {
                         Text("Cancel", fontFamily = acherusFeral, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 },
                 title = {
-                    Text(text = "Add Link", fontFamily = acherusFeral, color = colorResource(R.color.green), fontWeight = FontWeight.Bold)
+                    Text(text = "Add Link", fontFamily = acherusFeral, color = appGreen(), fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
@@ -141,7 +138,7 @@ fun NoteScreen(
                         )
                     }
                 },
-                containerColor = colorResource(id = R.color.light_green)
+                containerColor = appLightGreenSurface()
             )
         }
 
@@ -155,116 +152,108 @@ fun NoteScreen(
                             fontFamily = acherusFeral,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            color = colorResource(id = R.color.white)
+                            color = appOnGreenTopBar()
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navController.navigate("home") }) {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.back),
                                 contentDescription = "Back",
-                                tint = colorResource(id = R.color.card_color)
+                                tint = appOnGreenIcon()
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = colorResource(id = R.color.green))
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                if (isKnowledgeCheckMode) {
+                                    isKnowledgeCheckMode = false
+                                    knowledgeCheckSegments = emptyList()
+                                    revealedWordIds = emptySet()
+                                } else {
+                                    isReadMode = false
+                                    val plainText = MarkdownStorage.plainText(state.text)
+                                    knowledgeCheckSegments = KnowledgeCheckGenerator.generate(
+                                        plainText = plainText,
+                                        seed = noteId
+                                    )
+                                    revealedWordIds = emptySet()
+                                    isKnowledgeCheckMode = true
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if (isKnowledgeCheckMode) R.drawable.eye else R.drawable.instruction
+                                ),
+                                contentDescription = stringResource(
+                                    if (isKnowledgeCheckMode) {
+                                        R.string.knowledge_check_on
+                                    } else {
+                                        R.string.knowledge_check
+                                    }
+                                ),
+                                tint = appOnGreenIcon()
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                if (isReadMode) {
+                                    isReadMode = false
+                                } else {
+                                    isKnowledgeCheckMode = false
+                                    knowledgeCheckSegments = emptyList()
+                                    revealedWordIds = emptySet()
+                                    isReadMode = true
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if (isReadMode) R.drawable.edit else R.drawable.instruction
+                                ),
+                                contentDescription = stringResource(
+                                    if (isReadMode) {
+                                        R.string.markdown_edit_mode
+                                    } else {
+                                        R.string.markdown_read_mode
+                                    }
+                                ),
+                                tint = appOnGreenIcon()
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = appGreen())
                 )
             },
             bottomBar = {
-                RichTextToolbar(
-                    onBoldClick = {
-                        state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        boldSelected = !boldSelected
-                    },
-                    onItalicClick = {
-                        state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                        italicSelected = !italicSelected
-                    },
-                    onUnderlineClick = {
-                        state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                        underlineSelected = !underlineSelected
-                    },
-                    onStrikethroughClick = {
-                        state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-                        strikethroughSelected = !strikethroughSelected
-                    },
-                    onTitleClick = {
-                        state.toggleSpanStyle(SpanStyle(fontSize = titleSize))
-                        titleSelected = !titleSelected
-                    },
-                    onSubtitleClick = {
-                        state.toggleSpanStyle(SpanStyle(fontSize = subtitleSize))
-                        subtitleSelected = !subtitleSelected
-                    },
-                    onTextColorClick = {
-                        state.toggleSpanStyle(SpanStyle(color = Color.Red))
-                        textColorSelected = !textColorSelected
-                    },
-                    onLinkClick = {
-                        showLinkDialog = true
-                        linkSelected = true
-                    },
-                    onCodeClick = {
-                        state.toggleCodeSpan()
-                        codeSelected = !codeSelected
-                    },
-                    onQuoteClick = {
-                        quoteSelected = !quoteSelected
-                    },
-                    onBulletListClick = {
-                        state.toggleUnorderedList()
-                        bulletListSelected = !bulletListSelected
-                    },
-                    onNumberListClick = {
-                        state.toggleOrderedList()
-                        numberListSelected = !numberListSelected
-                    },
-                    onAlignLeftClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
-                        alignmentSelected = 0
-                    },
-                    onAlignCenterClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
-                        alignmentSelected = 1
-                    },
-                    onAlignRightClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
-                        alignmentSelected = 2
-                    },
-                    onUndoClick = { },
-                    onRedoClick = { },
-                    boldSelected = boldSelected,
-                    italicSelected = italicSelected,
-                    underlineSelected = underlineSelected,
-                    strikethroughSelected = strikethroughSelected,
-                    titleSelected = titleSelected,
-                    subtitleSelected = subtitleSelected,
-                    textColorSelected = textColorSelected,
-                    linkSelected = linkSelected,
-                    codeSelected = codeSelected,
-                    quoteSelected = quoteSelected,
-                    bulletListSelected = bulletListSelected,
-                    numberListSelected = numberListSelected,
-                    alignmentSelected = alignmentSelected
-                )
+                if (!isKnowledgeCheckMode && !isReadMode) {
+                    ConnectedMarkdownToolbar(
+                        state = state,
+                        onLinkClick = { showLinkDialog = true }
+                    )
+                }
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        val updatedContent = state.toMarkdown()
-                        coroutineScope.launch {
-                            noteViewModel.noteDao.updateNoteContent(id = noteId, updatedContent)
-                        }
-                        navController.navigate("home")
-                    },
-                    containerColor = colorResource(id = R.color.green),
-                    contentColor = colorResource(id = R.color.white)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.success),
-                        tint = colorResource(id = R.color.card_color),
-                        contentDescription = "Save"
-                    )
+                if (!isKnowledgeCheckMode && !isReadMode) {
+                    FloatingActionButton(
+                        onClick = {
+                            val updatedContent = MarkdownStorage.save(state)
+                            coroutineScope.launch {
+                                noteViewModel.noteDao.updateNoteContent(id = noteId, updatedContent)
+                            }
+                            navController.popBackStack()
+                        },
+                        containerColor = appGreen(),
+                        contentColor = appOnGreenTopBar()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.success),
+                            tint = appOnGreenIcon(),
+                            contentDescription = "Save"
+                        )
+                    }
                 }
             }
         ) { paddingValues ->
@@ -277,40 +266,76 @@ fun NoteScreen(
                 TagSection(tag = noteTag)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                val isDark = isSystemInDarkTheme()
-                RichTextEditor(
-                    colors = RichTextEditorDefaults.richTextEditorColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        cursorColor = colorResource(R.color.green),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        selectionColors = TextSelectionColors(
-                            handleColor = colorResource(R.color.green),
-                            backgroundColor = colorResource(if (isDark) R.color.green else R.color.card_color)
-                        )
-                    ),
+                val editorMode = when {
+                    isKnowledgeCheckMode -> NoteEditorMode.KnowledgeCheck
+                    isReadMode -> NoteEditorMode.Read
+                    else -> NoteEditorMode.Edit
+                }
+                AnimatedContent(
+                    targetState = editorMode,
+                    transitionSpec = { contentTransitionSpec() },
                     modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    textStyle = TextStyle(
-                        fontFamily = acherusFeral,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                )
+                    label = "note_editor_mode",
+                ) { mode ->
+                    when (mode) {
+                        NoteEditorMode.KnowledgeCheck -> {
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                Text(
+                                    text = stringResource(R.string.knowledge_check_hint),
+                                    fontFamily = acherusFeral,
+                                    fontSize = 13.sp,
+                                    color = appGreen(),
+                                    modifier = Modifier.padding(bottom = 12.dp)
+                                )
+                                KnowledgeCheckText(
+                                    segments = knowledgeCheckSegments,
+                                    revealedWordIds = revealedWordIds,
+                                    onRevealWord = { wordId ->
+                                        revealedWordIds = revealedWordIds + wordId
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .verticalScroll(rememberScrollState())
+                                )
+                            }
+                        }
+                        NoteEditorMode.Read -> {
+                            MarkdownPreview(
+                                markdown = state.text,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        NoteEditorMode.Edit -> {
+                            MarkdownEditor(
+                                state = state,
+                                textStyle = TextStyle(
+                                    fontFamily = acherusFeral,
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
+private enum class NoteEditorMode {
+    Edit,
+    Read,
+    KnowledgeCheck,
+}
+
 @Composable
 fun TagSection(tag: String) {
-    val isDark = isSystemInDarkTheme()
-    val color = if (isDark) R.color.card_color else R.color.green
+    val borderAndTextColor = if (isAppInDarkTheme()) appChipSelectedText() else appGreen()
 
     UroborosTheme {
         Card(
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = color)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, borderAndTextColor),
             shape = RoundedCornerShape(8.dp)
         ) {
             Row(
@@ -320,7 +345,7 @@ fun TagSection(tag: String) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = tag,
-                    color = colorResource(id = color),
+                    color = borderAndTextColor,
                     fontWeight = FontWeight.Bold,
                     fontFamily = acherusFeral
                 )

@@ -13,6 +13,15 @@ interface NoteDao {
     @Query("SELECT * FROM NOTE")
     fun getAllNote(): LiveData<List<Note>>
 
+    @Query("SELECT * FROM NOTE")
+    suspend fun getAllNotesSync(): List<Note>
+
+    @Query("SELECT * FROM NOTE WHERE id = :id LIMIT 1")
+    suspend fun getNoteById(id: Long): Note?
+
+    @Query("DELETE FROM NOTE")
+    suspend fun deleteAllNotes()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addNote(note: Note): Long
 

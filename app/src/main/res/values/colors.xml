@@ -19,4 +19,7 @@
     <color name="error_red">#F76945</color>
     <color name="rich_text_editor_background">#F3FBFE</color>
     <color name="orange_donation">#FF7E29</color>
+    <color name="code_block_background">#1A2420</color>
+    <color name="code_block_text">#D8E8DE</color>
+    <color name="code_block_language">#A9E3BA</color>
 </resources>

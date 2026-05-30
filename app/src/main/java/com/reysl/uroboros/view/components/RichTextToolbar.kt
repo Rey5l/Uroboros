@@ -12,35 +12,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FormatAlignLeft
-import androidx.compose.material.icons.automirrored.filled.FormatAlignRight
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.AddLink
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.FormatAlignCenter
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatColorText
-import androidx.compose.material.icons.filled.FormatItalic
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.FormatStrikethrough
-import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.reysl.uroboros.R
 
 @Composable
@@ -55,6 +42,7 @@ fun RichTextToolbar(
     onTextColorClick: () -> Unit,
     onLinkClick: () -> Unit,
     onCodeClick: () -> Unit,
+    onCodeBlockClick: () -> Unit,
     onQuoteClick: () -> Unit,
     onBulletListClick: () -> Unit,
     onNumberListClick: () -> Unit,
@@ -72,6 +60,7 @@ fun RichTextToolbar(
     textColorSelected: Boolean = false,
     linkSelected: Boolean = false,
     codeSelected: Boolean = false,
+    codeBlockSelected: Boolean = false,
     quoteSelected: Boolean = false,
     bulletListSelected: Boolean = false,
     numberListSelected: Boolean = false,
@@ -90,145 +79,191 @@ fun RichTextToolbar(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ToolbarButton(
-                icon = Icons.AutoMirrored.Filled.Undo,
-                contentDescription = "Undo",
-                onClick = onUndoClick,
-                selected = false
-            )
-
-            ToolbarButton(
-                icon = Icons.AutoMirrored.Filled.Redo,
-                contentDescription = "Redo",
-                onClick = onRedoClick,
-                selected = false
-            )
+            ToolbarTextButton(text = "↩", contentDescription = "Undo", onClick = onUndoClick, selected = false)
+            ToolbarTextButton(text = "↪", contentDescription = "Redo", onClick = onRedoClick, selected = false)
 
             ToolbarDivider()
 
-            ToolbarButton(
-                icon = Icons.Default.FormatBold,
+            ToolbarTextButton(
+                text = "B",
                 contentDescription = "Bold",
                 onClick = onBoldClick,
-                selected = boldSelected
+                selected = boldSelected,
+                fontWeight = FontWeight.Bold,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatItalic,
+            ToolbarTextButton(
+                text = "I",
                 contentDescription = "Italic",
                 onClick = onItalicClick,
-                selected = italicSelected
+                selected = italicSelected,
+                fontStyle = FontStyle.Italic,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatUnderlined,
+            ToolbarTextButton(
+                text = "U",
                 contentDescription = "Underline",
                 onClick = onUnderlineClick,
-                selected = underlineSelected
+                selected = underlineSelected,
+                textDecoration = TextDecoration.Underline,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatStrikethrough,
+            ToolbarTextButton(
+                text = "S",
                 contentDescription = "Strikethrough",
                 onClick = onStrikethroughClick,
-                selected = strikethroughSelected
+                selected = strikethroughSelected,
+                textDecoration = TextDecoration.LineThrough,
             )
 
             ToolbarDivider()
 
-            ToolbarButton(
-                icon = Icons.Default.Title,
+            ToolbarTextButton(
+                text = "H1",
                 contentDescription = "Title",
                 onClick = onTitleClick,
-                selected = titleSelected
+                selected = titleSelected,
+                fontWeight = FontWeight.Bold,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatSize,
+            ToolbarTextButton(
+                text = "H2",
                 contentDescription = "Subtitle",
                 onClick = onSubtitleClick,
-                selected = subtitleSelected
+                selected = subtitleSelected,
+                fontWeight = FontWeight.Bold,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatColorText,
+            ToolbarTextButton(
+                text = "A",
                 contentDescription = "Text Color",
                 onClick = onTextColorClick,
-                selected = textColorSelected
+                selected = textColorSelected,
+                fontWeight = FontWeight.Bold,
             )
 
             ToolbarDivider()
 
-            ToolbarButton(
-                icon = Icons.Default.AddLink,
+            ToolbarTextButton(
+                text = "🔗",
                 contentDescription = "Link",
                 onClick = onLinkClick,
-                selected = linkSelected
+                selected = linkSelected,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.Code,
-                contentDescription = "Code",
+            ToolbarIconButton(
+                iconRes = R.drawable.code,
+                contentDescription = "Inline code",
                 onClick = onCodeClick,
-                selected = codeSelected
+                selected = codeSelected,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatQuote,
+            ToolbarTextButton(
+                text = "<>",
+                contentDescription = "Code block",
+                onClick = onCodeBlockClick,
+                selected = codeBlockSelected,
+                fontWeight = FontWeight.Bold,
+            )
+            ToolbarTextButton(
+                text = "❝",
                 contentDescription = "Quote",
                 onClick = onQuoteClick,
-                selected = quoteSelected
+                selected = quoteSelected,
             )
 
             ToolbarDivider()
 
-            ToolbarButton(
-                icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+            ToolbarTextButton(
+                text = "•",
                 contentDescription = "Bullet List",
                 onClick = onBulletListClick,
-                selected = bulletListSelected
+                selected = bulletListSelected,
+                fontWeight = FontWeight.Bold,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatListNumbered,
+            ToolbarTextButton(
+                text = "1.",
                 contentDescription = "Number List",
                 onClick = onNumberListClick,
-                selected = numberListSelected
+                selected = numberListSelected,
+                fontWeight = FontWeight.Bold,
             )
 
             ToolbarDivider()
 
-            ToolbarButton(
-                icon = Icons.AutoMirrored.Filled.FormatAlignLeft,
+            ToolbarTextButton(
+                text = "L",
                 contentDescription = "Align Left",
                 onClick = onAlignLeftClick,
-                selected = alignmentSelected == 0
+                selected = alignmentSelected == 0,
             )
-
-            ToolbarButton(
-                icon = Icons.Default.FormatAlignCenter,
+            ToolbarTextButton(
+                text = "C",
                 contentDescription = "Align Center",
                 onClick = onAlignCenterClick,
-                selected = alignmentSelected == 1
+                selected = alignmentSelected == 1,
             )
-
-            ToolbarButton(
-                icon = Icons.AutoMirrored.Filled.FormatAlignRight,
+            ToolbarTextButton(
+                text = "R",
                 contentDescription = "Align Right",
                 onClick = onAlignRightClick,
-                selected = alignmentSelected == 2
+                selected = alignmentSelected == 2,
             )
         }
     }
 }
 
 @Composable
-private fun ToolbarButton(
-    icon: ImageVector,
+private fun ToolbarTextButton(
+    text: String,
     contentDescription: String,
     onClick: () -> Unit,
     selected: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontStyle: FontStyle = FontStyle.Normal,
+    textDecoration: TextDecoration? = null,
+) {
+    ToolbarButtonContainer(
+        contentDescription = contentDescription,
+        onClick = onClick,
+        selected = selected,
+        modifier = modifier,
+    ) {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            textDecoration = textDecoration,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+@Composable
+private fun ToolbarIconButton(
+    iconRes: Int,
+    contentDescription: String,
+    onClick: () -> Unit,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    ToolbarButtonContainer(
+        contentDescription = contentDescription,
+        onClick = onClick,
+        selected = selected,
+        modifier = modifier,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = contentDescription,
+            tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+@Composable
+private fun ToolbarButtonContainer(
+    contentDescription: String,
+    onClick: () -> Unit,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -248,12 +283,7 @@ private fun ToolbarButton(
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(20.dp)
-        )
+        content()
     }
 }
 

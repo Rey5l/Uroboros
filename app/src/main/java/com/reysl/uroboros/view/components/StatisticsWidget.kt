@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.reysl.uroboros.R
-import com.reysl.uroboros.view.screens.acherusFeral
+import com.reysl.uroboros.ui.theme.acherusFeral
 import com.reysl.uroboros.viewmodel.NoteViewModel
 
 @Composable

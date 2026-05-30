@@ -14,6 +14,12 @@ interface TagDao {
     @Query("SELECT * FROM tags")
     fun getAllTags(): LiveData<List<Tag>>
 
+    @Query("SELECT * FROM tags")
+    suspend fun getAllTagsSync(): List<Tag>
+
+    @Query("DELETE FROM tags")
+    suspend fun deleteAllTags()
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addTag(tag: Tag)
 

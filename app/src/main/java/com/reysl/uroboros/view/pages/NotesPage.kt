@@ -1,360 +1,380 @@
 package com.reysl.uroboros.view.pages
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import com.reysl.uroboros.R
-import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.ui.theme.appEditorSurface
+import com.reysl.uroboros.ui.theme.appGreen
+import com.reysl.uroboros.ui.theme.appOnGreenIcon
+import com.reysl.uroboros.ui.theme.appOnGreenTopBar
+import com.reysl.uroboros.ui.theme.appSecondaryText
+import com.reysl.uroboros.utils.MarkdownEditorController
+import com.reysl.uroboros.utils.MarkdownStorage
+import com.reysl.uroboros.utils.performHapticTick
+import com.reysl.uroboros.utils.rememberMarkdownEditorState
 import com.reysl.uroboros.view.components.AddMaterialDialog
-import com.reysl.uroboros.view.components.RichTextToolbar
-import com.reysl.uroboros.view.components.formatTime
-import com.reysl.uroboros.view.screens.acherusFeral
+import com.reysl.uroboros.view.components.ConnectedMarkdownToolbar
+import com.reysl.uroboros.view.components.MarkdownEditor
+import com.reysl.uroboros.view.components.MarkdownPreview
+import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.ui.theme.acherusFeral
 import com.reysl.uroboros.viewmodel.NoteViewModel
-import java.util.Date
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesPage(
-    noteViewModel: NoteViewModel
+    noteViewModel: NoteViewModel,
 ) {
-
-    var showDialog by remember { mutableStateOf(false) }
-    var latestTitle by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val state = rememberRichTextState()
+    val state = rememberMarkdownEditorState()
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var showLinkDialog by rememberSaveable { mutableStateOf(false) }
+    var isReadMode by rememberSaveable { mutableStateOf(false) }
+    var lastSavedTitle by rememberSaveable { mutableStateOf("") }
+    var linkText by rememberSaveable { mutableStateOf("") }
+    var link by rememberSaveable { mutableStateOf("") }
+
+    val hasContent = state.text.isNotBlank()
+    val charCount = state.text.length
 
     UroborosTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(230.dp)
-                    .background(colorResource(id = R.color.green))
-            ) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 20.dp, top = 30.dp),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        IconButton(onClick = { showDialog = true }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.adding),
-                                contentDescription = "Add note",
-                                modifier = Modifier.size(64.dp)
-                            )
-                        }
-                    }
-                    if (latestTitle == "") {
-                        Text(
-                            text = stringResource(R.string.new_material),
-                            fontFamily = acherusFeral,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 30.sp,
-                            modifier = Modifier.padding(start = 30.dp),
-                            color = colorResource(id = R.color.white),
-                            style = TextStyle(lineHeight = 50.sp)
-                        )
-                    } else {
-                        Text(
-                            text = latestTitle,
-                            fontFamily = acherusFeral,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 30.sp,
-                            modifier = Modifier.padding(start = 30.dp),
-                            color = colorResource(id = R.color.white),
-                            style = TextStyle(lineHeight = 50.sp)
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(end = 20.dp, bottom = 20.dp),
-                        contentAlignment = Alignment.BottomEnd
-                    ) {
-                        Card(
-                            shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.light_green)),
-                        ) {
-                            Text(
-                                text = formatTime(Date()),
-                                fontFamily = acherusFeral,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                color = colorResource(id = R.color.green),
-                                modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp)
-                            )
-                        }
-                    }
+        if (showLinkDialog) {
+            LinkInputDialog(
+                linkText = linkText,
+                link = link,
+                onLinkTextChange = { linkText = it },
+                onLinkChange = { link = it },
+                onDismiss = { showLinkDialog = false },
+                onConfirm = {
+                    MarkdownEditorController.insertLink(state, linkText, link)
+                    showLinkDialog = false
+                    linkText = ""
+                    link = ""
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                TextEditor(state)
-            }
+            )
         }
+
         if (showDialog) {
             AddMaterialDialog(
                 onDismissRequest = { showDialog = false },
                 onAddMaterial = { title, description, tag ->
-                    noteViewModel.addNote(title, description, tag, state.toMarkdown(), context)
+                    noteViewModel.addNote(
+                        title = title,
+                        description = description,
+                        tag = tag,
+                        markdownText = MarkdownStorage.save(state),
+                        context = context,
+                    )
+                    performHapticTick(context)
+                    lastSavedTitle = title
+                    state.clearContent()
+                    isReadMode = false
                     showDialog = false
-                    latestTitle = title
                 }
-            )
-        }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TextEditor(
-    state: RichTextState
-) {
-    val titleSize = MaterialTheme.typography.titleLarge.fontSize
-    val subtitleSize = MaterialTheme.typography.titleMedium.fontSize
-
-    var boldSelected by rememberSaveable { mutableStateOf(false) }
-    var italicSelected by rememberSaveable { mutableStateOf(false) }
-    var underlineSelected by rememberSaveable { mutableStateOf(false) }
-    var strikethroughSelected by rememberSaveable { mutableStateOf(false) }
-    var titleSelected by rememberSaveable { mutableStateOf(false) }
-    var subtitleSelected by rememberSaveable { mutableStateOf(false) }
-    var textColorSelected by rememberSaveable { mutableStateOf(false) }
-    var linkSelected by rememberSaveable { mutableStateOf(false) }
-    var codeSelected by rememberSaveable { mutableStateOf(false) }
-    var quoteSelected by rememberSaveable { mutableStateOf(false) }
-    var bulletListSelected by rememberSaveable { mutableStateOf(false) }
-    var numberListSelected by rememberSaveable { mutableStateOf(false) }
-    var alignmentSelected by rememberSaveable { mutableIntStateOf(0) }
-
-    var showLinkDialog by remember { mutableStateOf(false) }
-    var linkText by remember { mutableStateOf("") }
-    var link by remember { mutableStateOf("") }
-
-    UroborosTheme {
-        if (showLinkDialog) {
-            AlertDialog(
-                onDismissRequest = {
-                    showLinkDialog = false
-                    linkSelected = false
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            state.addLink(text = linkText, url = link)
-                            showLinkDialog = false
-                            linkSelected = false
-                            linkText = ""
-                            link = ""
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                    ) {
-                        Text("Confirm", fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = acherusFeral)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            showLinkDialog = false
-                            linkSelected = false
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.green))
-                    ) {
-                        Text("Cancel", fontFamily = acherusFeral, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                },
-                title = {
-                    Text(text = "Add Link", fontFamily = acherusFeral, color = colorResource(R.color.green), fontWeight = FontWeight.Bold)
-                },
-                text = {
-                    Column {
-                        OutlinedTextField(
-                            value = linkText,
-                            onValueChange = { linkText = it },
-                            label = { Text("Text to display", fontFamily = acherusFeral) }
-                        )
-                        OutlinedTextField(
-                            value = link,
-                            onValueChange = { link = it },
-                            label = { Text("Link URL", fontFamily = acherusFeral) }
-                        )
-                    }
-                },
-                containerColor = colorResource(id = R.color.light_green)
             )
         }
 
         Scaffold(
-            modifier = Modifier.imePadding(),
-            bottomBar = {
-                RichTextToolbar(
-                    onBoldClick = {
-                        state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        boldSelected = !boldSelected
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
+                NotesPageTopBar(
+                    lastSavedTitle = lastSavedTitle,
+                    isReadMode = isReadMode,
+                    onToggleReadMode = {
+                        isReadMode = !isReadMode
                     },
-                    onItalicClick = {
-                        state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                        italicSelected = !italicSelected
+                    onSaveClick = {
+                        if (hasContent) {
+                            performHapticTick(context)
+                            showDialog = true
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.notes_empty_content),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
                     },
-                    onUnderlineClick = {
-                        state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                        underlineSelected = !underlineSelected
-                    },
-                    onStrikethroughClick = {
-                        state.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-                        strikethroughSelected = !strikethroughSelected
-                    },
-                    onTitleClick = {
-                        state.toggleSpanStyle(SpanStyle(fontSize = titleSize))
-                        titleSelected = !titleSelected
-                    },
-                    onSubtitleClick = {
-                        state.toggleSpanStyle(SpanStyle(fontSize = subtitleSize))
-                        subtitleSelected = !subtitleSelected
-                    },
-                    onTextColorClick = {
-                        state.toggleSpanStyle(SpanStyle(color = Color.Red))
-                        textColorSelected = !textColorSelected
-                    },
-                    onLinkClick = {
-                        showLinkDialog = true
-                        linkSelected = true
-                    },
-                    onCodeClick = {
-                        state.toggleCodeSpan()
-                        codeSelected = !codeSelected
-                    },
-                    onQuoteClick = {
-                        // Quote functionality - можно добавить позже
-                        quoteSelected = !quoteSelected
-                    },
-                    onBulletListClick = {
-                        state.toggleUnorderedList()
-                        bulletListSelected = !bulletListSelected
-                    },
-                    onNumberListClick = {
-                        state.toggleOrderedList()
-                        numberListSelected = !numberListSelected
-                    },
-                    onAlignLeftClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
-                        alignmentSelected = 0
-                    },
-                    onAlignCenterClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
-                        alignmentSelected = 1
-                    },
-                    onAlignRightClick = {
-                        state.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
-                        alignmentSelected = 2
-                    },
-                    onUndoClick = {
-                        // Undo functionality
-                    },
-                    onRedoClick = {
-                        // Redo functionality
-                    },
-                    boldSelected = boldSelected,
-                    italicSelected = italicSelected,
-                    underlineSelected = underlineSelected,
-                    strikethroughSelected = strikethroughSelected,
-                    titleSelected = titleSelected,
-                    subtitleSelected = subtitleSelected,
-                    textColorSelected = textColorSelected,
-                    linkSelected = linkSelected,
-                    codeSelected = codeSelected,
-                    quoteSelected = quoteSelected,
-                    bulletListSelected = bulletListSelected,
-                    numberListSelected = numberListSelected,
-                    alignmentSelected = alignmentSelected
                 )
-            }
+            },
+            bottomBar = {
+                if (!isReadMode) {
+                    ConnectedMarkdownToolbar(
+                        state = state,
+                        onLinkClick = { showLinkDialog = true },
+                        modifier = Modifier.imePadding(),
+                    )
+                }
+            },
         ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 20.dp, vertical = 20.dp)
+                    .padding(horizontal = 16.dp),
             ) {
-                val isDark = isSystemInDarkTheme()
-                RichTextEditor(
-                    colors = RichTextEditorDefaults.richTextEditorColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        cursorColor = colorResource(R.color.green),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        selectionColors = TextSelectionColors(
-                            handleColor = colorResource(R.color.green),
-                            backgroundColor = colorResource(if (isDark) R.color.green else R.color.card_color)
-                        )
-                    ),
-                    modifier = Modifier.fillMaxSize(),
+                NotesEditorCard(
+                    isReadMode = isReadMode,
+                    hasContent = hasContent,
                     state = state,
-                    textStyle = TextStyle(
-                        fontFamily = acherusFeral,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
+                    modifier = Modifier.weight(1f),
+                )
+
+                Text(
+                    text = stringResource(R.string.notes_char_count, charCount),
+                    fontFamily = acherusFeral,
+                    fontSize = 12.sp,
+                    color = appSecondaryText(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    textAlign = TextAlign.End,
                 )
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NotesPageTopBar(
+    lastSavedTitle: String,
+    isReadMode: Boolean,
+    onToggleReadMode: () -> Unit,
+    onSaveClick: () -> Unit,
+) {
+    TopAppBar(
+        windowInsets = WindowInsets(0, 0, 0, 0),
+        title = {
+            Column {
+                Text(
+                    text = stringResource(R.string.new_material),
+                    fontFamily = acherusFeral,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = appOnGreenTopBar(),
+                )
+                Text(
+                    text = if (lastSavedTitle.isBlank()) {
+                        stringResource(R.string.notes_page_subtitle)
+                    } else {
+                        stringResource(R.string.notes_last_saved, lastSavedTitle)
+                    },
+                    fontFamily = acherusFeral,
+                    fontSize = 12.sp,
+                    color = appOnGreenIcon(),
+                    lineHeight = 16.sp,
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onToggleReadMode) {
+                Icon(
+                    painter = painterResource(
+                        if (isReadMode) R.drawable.edit else R.drawable.instruction
+                    ),
+                    contentDescription = stringResource(
+                        if (isReadMode) R.string.markdown_edit_mode else R.string.markdown_read_mode
+                    ),
+                    tint = appOnGreenIcon(),
+                )
+            }
+            IconButton(onClick = onSaveClick) {
+                Icon(
+                    painter = painterResource(R.drawable.success),
+                    contentDescription = stringResource(R.string.notes_save_material),
+                    tint = appOnGreenIcon(),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = appGreen(),
+        ),
+    )
+}
+
+@Composable
+private fun NotesEditorCard(
+    isReadMode: Boolean,
+    hasContent: Boolean,
+    state: com.reysl.uroboros.utils.MarkdownEditorState,
+    modifier: Modifier = Modifier,
+) {
+    val borderColor = appGreen()
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = appEditorSurface(),
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, borderColor.copy(alpha = 0.25f)),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            when {
+                isReadMode -> {
+                    if (hasContent) {
+                        MarkdownPreview(
+                            markdown = state.text,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        NotesEmptyHint()
+                    }
+                }
+                else -> {
+                    MarkdownEditor(
+                        state = state,
+                        modifier = Modifier.fillMaxSize(),
+                        textStyle = TextStyle(
+                            fontFamily = acherusFeral,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            lineHeight = 24.sp,
+                        ),
+                        placeholder = stringResource(R.string.notes_empty_hint),
+                        placeholderStyle = TextStyle(
+                            fontFamily = acherusFeral,
+                            fontSize = 15.sp,
+                            color = appSecondaryText(),
+                            lineHeight = 22.sp,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotesEmptyHint() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.notes_empty_hint),
+            fontFamily = acherusFeral,
+            fontSize = 15.sp,
+            color = colorResource(R.color.text_color),
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp,
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+    }
+}
+
+@Composable
+private fun LinkInputDialog(
+    linkText: String,
+    link: String,
+    onLinkTextChange: (String) -> Unit,
+    onLinkChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                colors = ButtonDefaults.textButtonColors(contentColor = appGreen()),
+            ) {
+                Text(
+                    text = stringResource(R.string.add),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = acherusFeral,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = appGreen()),
+            ) {
+                Text(
+                    text = stringResource(R.string.cancel),
+                    fontFamily = acherusFeral,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        title = {
+            Text(
+                text = "Add Link",
+                fontFamily = acherusFeral,
+                color = colorResource(R.color.green),
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = linkText,
+                    onValueChange = onLinkTextChange,
+                    label = { Text("Text to display", fontFamily = acherusFeral) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = link,
+                    onValueChange = onLinkChange,
+                    label = { Text("Link URL", fontFamily = acherusFeral) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        containerColor = colorResource(R.color.light_green),
+    )
 }

@@ -15,15 +15,17 @@ fun scheduleReminder(
     noteTitle: String,
     noteContent: String,
     noteTag: String,
-    daysUntilReminder: Long
+    delayMillis: Long,
 ) {
+    if (delayMillis <= 0) return
+
     val constraints = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
         .setRequiresBatteryNotLow(false)
         .build()
 
     val reminderRequest: WorkRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
-        .setInitialDelay(daysUntilReminder, TimeUnit.DAYS)
+        .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
         .setConstraints(constraints)
         .setInputData(
             workDataOf(

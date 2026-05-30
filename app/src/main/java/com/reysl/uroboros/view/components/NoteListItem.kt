@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,14 +43,19 @@ import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.data.Note
 import com.reysl.uroboros.ui.theme.UroborosTheme
+import com.reysl.uroboros.ui.theme.acherusFeral
 import com.reysl.uroboros.utils.performHapticClick
 import com.reysl.uroboros.utils.performHapticTick
-import com.reysl.uroboros.view.screens.acherusFeral
 import com.reysl.uroboros.viewmodel.NoteViewModel
 import java.text.SimpleDateFormat
 
 @Composable
-fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavController) {
+fun NoteListItem(
+    note: Note,
+    viewModel: NoteViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
 
     val context = LocalContext.current
 
@@ -60,7 +65,7 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
 
     UroborosTheme {
         Card(
-            modifier = Modifier
+            modifier = modifier
                 .padding(horizontal = 8.dp, vertical = 8.dp)
                 .fillMaxWidth()
                 .clickable {
@@ -123,22 +128,19 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                             onClick = {
                                 viewModel.toggleFavourite(note)
                             }) {
-                            if (note.isFavourite) {
+                            Crossfade(
+                                targetState = note.isFavourite,
+                                label = "favourite_star",
+                            ) { isFavourite ->
                                 Icon(
-                                    painter = painterResource(id = R.drawable.star_filled),
+                                    painter = painterResource(
+                                        id = if (isFavourite) R.drawable.star_filled else R.drawable.star,
+                                    ),
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                     contentDescription = "Favourite",
-                                    modifier = Modifier.size(23.dp)
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.star),
-                                    tint = MaterialTheme.colorScheme.onPrimary,
-                                    contentDescription = "Favourite",
-                                    modifier = Modifier.size(23.dp)
+                                    modifier = Modifier.size(23.dp),
                                 )
                             }
-
                         }
                     }
 
@@ -163,10 +165,11 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        val badgeColor = MaterialTheme.colorScheme.onPrimary
                         Card(
                             modifier = Modifier.padding(top = 30.dp),
                             shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
+                            border = BorderStroke(1.dp, badgeColor),
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
                             Text(
@@ -179,21 +182,20 @@ fun NoteListItem(note: Note, viewModel: NoteViewModel, navController: NavControl
                                 fontFamily = acherusFeral,
                                 fontWeight = FontWeight.Light,
                                 fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = badgeColor,
                             )
                         }
                         Card(
                             modifier = Modifier.padding(top = 30.dp),
                             shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                            colors = CardDefaults.cardColors(containerColor = badgeColor),
                         ) {
-                            val isDark = isSystemInDarkTheme()
                             Text(
                                 text = formatTime(note.time),
                                 fontFamily = acherusFeral,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
-                                color = colorResource(id = if (isDark) R.color.green else R.color.white),
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
                                     .padding(start = 13.dp)
                                     .padding(end = 13.dp)
