@@ -106,7 +106,7 @@ fun HomePage(
                     onSortChange = { selected -> sortName = selected.name },
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.padding(start = 30.dp)) {
                 TagHomeContent(
                     tagViewModel = tagViewModel,

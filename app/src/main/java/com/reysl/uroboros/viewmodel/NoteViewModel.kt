@@ -79,6 +79,7 @@ class NoteViewModel : ViewModel() {
             try {
                 val tag = note.tag
                 noteDao.deleteNote(note.id)
+                MainApplication.noteDatabase.getMaterialQuizDao().deleteByNoteId(note.id)
 
                 val count = noteDao.getNotesCountByTag(tag)
                 if (count == 0) {

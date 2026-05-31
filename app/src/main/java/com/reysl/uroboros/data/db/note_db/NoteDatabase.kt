@@ -4,9 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.reysl.uroboros.components.Converters
+import com.reysl.uroboros.data.MaterialQuiz
 import com.reysl.uroboros.data.Note
 
-@Database(entities = [Note::class], version = 8)
+@Database(entities = [Note::class, MaterialQuiz::class], version = 9)
 @TypeConverters(Converters::class)
 abstract class NoteDatabase: RoomDatabase() {
 
@@ -15,4 +16,5 @@ abstract class NoteDatabase: RoomDatabase() {
     }
 
     abstract fun getNoteDao(): NoteDao
+    abstract fun getMaterialQuizDao(): MaterialQuizDao
 }

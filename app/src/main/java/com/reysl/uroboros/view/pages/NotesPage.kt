@@ -155,7 +155,7 @@ fun NotesPage(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
+                    .padding(16.dp),
             ) {
                 NotesEditorCard(
                     isReadMode = isReadMode,
@@ -215,7 +215,7 @@ private fun NotesPageTopBar(
             IconButton(onClick = onToggleReadMode) {
                 Icon(
                     painter = painterResource(
-                        if (isReadMode) R.drawable.edit else R.drawable.instruction
+                        if (isReadMode) R.drawable.edit_mode else R.drawable.read_mode
                     ),
                     contentDescription = stringResource(
                         if (isReadMode) R.string.markdown_edit_mode else R.string.markdown_read_mode

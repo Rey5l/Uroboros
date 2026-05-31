@@ -39,6 +39,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +57,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.reysl.uroboros.R
 import com.reysl.uroboros.ui.theme.UroborosTheme
@@ -67,9 +70,11 @@ import com.reysl.uroboros.utils.MarkdownStorage
 import com.reysl.uroboros.utils.contentTransitionSpec
 import com.reysl.uroboros.view.components.ConnectedMarkdownToolbar
 import com.reysl.uroboros.view.components.KnowledgeCheckText
+import com.reysl.uroboros.view.components.MaterialQuizContent
 import com.reysl.uroboros.view.components.MarkdownEditor
 import com.reysl.uroboros.view.components.MarkdownPreview
 import com.reysl.uroboros.viewmodel.NoteViewModel
+import com.reysl.uroboros.viewmodel.QuizViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +88,8 @@ fun NoteScreen(
     noteTag: String,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val quizViewModel: QuizViewModel = viewModel()
+    val quizUiState by quizViewModel.uiState.collectAsState()
     val state = remember(noteContent) {
         MarkdownEditorState(MarkdownStorage.normalize(noteContent))
     }
@@ -92,9 +99,16 @@ fun NoteScreen(
     var link by remember { mutableStateOf("") }
 
     var isKnowledgeCheckMode by rememberSaveable { mutableStateOf(false) }
+    var isQuizMode by rememberSaveable { mutableStateOf(false) }
     var isReadMode by rememberSaveable { mutableStateOf(false) }
     var knowledgeCheckSegments by remember { mutableStateOf<List<KnowledgeCheckSegment>>(emptyList()) }
     var revealedWordIds by remember { mutableStateOf(setOf<Int>()) }
+
+    LaunchedEffect(isQuizMode, noteId) {
+        if (isQuizMode) {
+            quizViewModel.loadQuiz(noteId)
+        }
+    }
 
     UroborosTheme {
         if (showLinkDialog) {
@@ -167,11 +181,35 @@ fun NoteScreen(
                     actions = {
                         IconButton(
                             onClick = {
+                                if (isQuizMode) {
+                                    isQuizMode = false
+                                } else {
+                                    isKnowledgeCheckMode = false
+                                    isReadMode = false
+                                    knowledgeCheckSegments = emptyList()
+                                    revealedWordIds = emptySet()
+                                    isQuizMode = true
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if (isQuizMode) R.drawable.disable_quiz else R.drawable.quiz_mode
+                                ),
+                                contentDescription = stringResource(
+                                    if (isQuizMode) R.string.quiz_close else R.string.quiz_mode
+                                ),
+                                tint = appOnGreenIcon()
+                            )
+                        }
+                        IconButton(
+                            onClick = {
                                 if (isKnowledgeCheckMode) {
                                     isKnowledgeCheckMode = false
                                     knowledgeCheckSegments = emptyList()
                                     revealedWordIds = emptySet()
                                 } else {
+                                    isQuizMode = false
                                     isReadMode = false
                                     val plainText = MarkdownStorage.plainText(state.text)
                                     knowledgeCheckSegments = KnowledgeCheckGenerator.generate(
@@ -185,7 +223,7 @@ fun NoteScreen(
                         ) {
                             Icon(
                                 painter = painterResource(
-                                    if (isKnowledgeCheckMode) R.drawable.eye else R.drawable.instruction
+                                    if (isKnowledgeCheckMode) R.drawable.eye else R.drawable.close_eye
                                 ),
                                 contentDescription = stringResource(
                                     if (isKnowledgeCheckMode) {
@@ -203,6 +241,7 @@ fun NoteScreen(
                                     isReadMode = false
                                 } else {
                                     isKnowledgeCheckMode = false
+                                    isQuizMode = false
                                     knowledgeCheckSegments = emptyList()
                                     revealedWordIds = emptySet()
                                     isReadMode = true
@@ -211,7 +250,7 @@ fun NoteScreen(
                         ) {
                             Icon(
                                 painter = painterResource(
-                                    if (isReadMode) R.drawable.edit else R.drawable.instruction
+                                    if (isReadMode) R.drawable.edit_mode else R.drawable.read_mode
                                 ),
                                 contentDescription = stringResource(
                                     if (isReadMode) {
@@ -228,7 +267,7 @@ fun NoteScreen(
                 )
             },
             bottomBar = {
-                if (!isKnowledgeCheckMode && !isReadMode) {
+                if (!isKnowledgeCheckMode && !isReadMode && !isQuizMode) {
                     ConnectedMarkdownToolbar(
                         state = state,
                         onLinkClick = { showLinkDialog = true }
@@ -236,7 +275,7 @@ fun NoteScreen(
                 }
             },
             floatingActionButton = {
-                if (!isKnowledgeCheckMode && !isReadMode) {
+                if (!isKnowledgeCheckMode && !isReadMode && !isQuizMode) {
                     FloatingActionButton(
                         onClick = {
                             val updatedContent = MarkdownStorage.save(state)
@@ -267,6 +306,7 @@ fun NoteScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 val editorMode = when {
+                    isQuizMode -> NoteEditorMode.Quiz
                     isKnowledgeCheckMode -> NoteEditorMode.KnowledgeCheck
                     isReadMode -> NoteEditorMode.Read
                     else -> NoteEditorMode.Edit
@@ -278,6 +318,19 @@ fun NoteScreen(
                     label = "note_editor_mode",
                 ) { mode ->
                     when (mode) {
+                        NoteEditorMode.Quiz -> {
+                            MaterialQuizContent(
+                                uiState = quizUiState,
+                                onGenerate = {
+                                    quizViewModel.generateQuiz(
+                                        noteId = noteId,
+                                        title = noteTitle,
+                                        markdownContent = state.text,
+                                    )
+                                },
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
                         NoteEditorMode.KnowledgeCheck -> {
                             Column(modifier = Modifier.fillMaxSize()) {
                                 Text(
@@ -326,6 +379,7 @@ private enum class NoteEditorMode {
     Edit,
     Read,
     KnowledgeCheck,
+    Quiz,
 }
 
 @Composable

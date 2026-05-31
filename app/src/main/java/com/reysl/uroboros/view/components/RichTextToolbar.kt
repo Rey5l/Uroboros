@@ -46,9 +46,6 @@ fun RichTextToolbar(
     onQuoteClick: () -> Unit,
     onBulletListClick: () -> Unit,
     onNumberListClick: () -> Unit,
-    onAlignLeftClick: () -> Unit,
-    onAlignCenterClick: () -> Unit,
-    onAlignRightClick: () -> Unit,
     onUndoClick: () -> Unit,
     onRedoClick: () -> Unit,
     boldSelected: Boolean = false,
@@ -64,7 +61,6 @@ fun RichTextToolbar(
     quoteSelected: Boolean = false,
     bulletListSelected: Boolean = false,
     numberListSelected: Boolean = false,
-    alignmentSelected: Int = 0
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -79,8 +75,18 @@ fun RichTextToolbar(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ToolbarTextButton(text = "↩", contentDescription = "Undo", onClick = onUndoClick, selected = false)
-            ToolbarTextButton(text = "↪", contentDescription = "Redo", onClick = onRedoClick, selected = false)
+            ToolbarIconButton(
+                iconRes = R.drawable.undo,
+                contentDescription = "Undo",
+                onClick = onUndoClick,
+                selected = false,
+            )
+            ToolbarIconButton(
+                iconRes = R.drawable.redo,
+                contentDescription = "Redo",
+                onClick = onRedoClick,
+                selected = false,
+            )
 
             ToolbarDivider()
 
@@ -167,40 +173,17 @@ fun RichTextToolbar(
 
             ToolbarDivider()
 
-            ToolbarTextButton(
-                text = "•",
+            ToolbarIconButton(
+                iconRes = R.drawable.unordered_list,
                 contentDescription = "Bullet List",
                 onClick = onBulletListClick,
                 selected = bulletListSelected,
-                fontWeight = FontWeight.Bold,
             )
-            ToolbarTextButton(
-                text = "1.",
+            ToolbarIconButton(
+                iconRes = R.drawable.ordered_list,
                 contentDescription = "Number List",
                 onClick = onNumberListClick,
                 selected = numberListSelected,
-                fontWeight = FontWeight.Bold,
-            )
-
-            ToolbarDivider()
-
-            ToolbarTextButton(
-                text = "L",
-                contentDescription = "Align Left",
-                onClick = onAlignLeftClick,
-                selected = alignmentSelected == 0,
-            )
-            ToolbarTextButton(
-                text = "C",
-                contentDescription = "Align Center",
-                onClick = onAlignCenterClick,
-                selected = alignmentSelected == 1,
-            )
-            ToolbarTextButton(
-                text = "R",
-                contentDescription = "Align Right",
-                onClick = onAlignRightClick,
-                selected = alignmentSelected == 2,
             )
         }
     }

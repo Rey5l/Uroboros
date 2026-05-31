@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.reysl.uroboros" />
-                  <option name="mobileSdkAppId" value="1:1085823740843:android:52cb19b717233ea51040ee" />
-                  <option name="projectId" value="uroboros-4cc4c" />
-                  <option name="projectNumber" value="1085823740843" />
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

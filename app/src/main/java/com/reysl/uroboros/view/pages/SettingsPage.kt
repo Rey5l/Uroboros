@@ -243,7 +243,7 @@ fun SettingsPage(
 
             SettingsSectionCard(title = stringResource(R.string.settings_data)) {
                 SettingsActionRow(
-                    icon = R.drawable.success,
+                    icon = R.drawable.upload,
                     label = stringResource(R.string.settings_export),
                     onClick = {
                         scope.launch {
@@ -262,7 +262,7 @@ fun SettingsPage(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 SettingsActionRow(
-                    icon = R.drawable.adding,
+                    icon = R.drawable.download,
                     label = stringResource(R.string.settings_import),
                     onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
                 )

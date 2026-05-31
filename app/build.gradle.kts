@@ -4,6 +4,15 @@ plugins {
     id("kotlin-kapt")
 }
 
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "com.reysl.uroboros"
     compileSdk = 34
@@ -14,6 +23,12 @@ android {
         targetSdk = 34
         versionCode = 2
         versionName = "1.0"
+
+        buildConfigField(
+            "String",
+            "HUGGING_FACE_TOKEN",
+            "\"${localProperties.getProperty("HUGGING_FACE_TOKEN", "")}\"",
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -40,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
@@ -92,4 +108,11 @@ dependencies {
 
     // HTML parsing for share import
     implementation("org.jsoup:jsoup:1.17.2")
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    kapt(libs.moshi.kotlin)
 }

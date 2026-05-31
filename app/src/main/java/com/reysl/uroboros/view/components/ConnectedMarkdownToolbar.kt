@@ -29,9 +29,6 @@ fun ConnectedMarkdownToolbar(
         onQuoteClick = { MarkdownEditorController.toggleQuote(state) },
         onBulletListClick = { MarkdownEditorController.toggleBulletList(state) },
         onNumberListClick = { MarkdownEditorController.toggleNumberList(state) },
-        onAlignLeftClick = { },
-        onAlignCenterClick = { },
-        onAlignRightClick = { },
         onUndoClick = { MarkdownEditorController.undo(state) },
         onRedoClick = { MarkdownEditorController.redo(state) },
         boldSelected = ui.boldSelected,
@@ -47,6 +44,5 @@ fun ConnectedMarkdownToolbar(
         quoteSelected = ui.quoteSelected,
         bulletListSelected = ui.bulletListSelected,
         numberListSelected = ui.numberListSelected,
-        alignmentSelected = 0,
     )
 }

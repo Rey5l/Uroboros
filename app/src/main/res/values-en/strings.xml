@@ -79,4 +79,25 @@
     <string name="telegram_channel">Telegram Channel</string>
     <string name="feedback">Feedback</string>
     <string name="close">Close</string>
+    <string name="quiz_mode">Material quiz</string>
+    <string name="quiz_close">Close quiz</string>
+    <string name="quiz_generate">Generate question</string>
+    <string name="quiz_regenerate">Generate again</string>
+    <string name="quiz_loading">Loading question…</string>
+    <string name="quiz_generating">Generating question…</string>
+    <string name="quiz_empty_hint">Create a multiple-choice question based on this material. Internet is required.</string>
+    <string name="quiz_remaining_today">Generations left today: %1$d</string>
+    <string name="quiz_question_label">Question</string>
+    <string name="quiz_answer_correct">Correct!</string>
+    <string name="quiz_answer_incorrect">Incorrect</string>
+    <string name="quiz_correct_answer">Correct answer: %1$s</string>
+    <string name="quiz_error_missing_token">Add HUGGING_FACE_TOKEN to local.properties to generate questions</string>
+    <string name="quiz_error_daily_limit">Daily generation limit reached (3 per day). Try again tomorrow.</string>
+    <string name="quiz_error_material_short">Material is too short to generate a question</string>
+    <string name="quiz_error_invalid_response">Could not parse model response. Please try again.</string>
+    <string name="quiz_error_network">No internet connection or server unavailable</string>
+    <string name="quiz_error_api">Generation server error</string>
+    <string name="quiz_error_api_unauthorized">Invalid Hugging Face token (HTTP 401)</string>
+    <string name="quiz_error_api_forbidden">Hugging Face token lacks Inference Providers permission (HTTP 403). Create a fine-grained token with «Make calls to Inference Providers» at huggingface.co/settings/tokens</string>
+    <string name="quiz_error_unknown">Failed to generate question</string>
 </resources>
