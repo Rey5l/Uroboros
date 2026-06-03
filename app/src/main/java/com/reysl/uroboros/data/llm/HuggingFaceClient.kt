@@ -52,7 +52,11 @@ class LlmQuizResponseParser(moshi: Moshi) {
 
     fun parse(rawText: String): GeneratedQuizPayload? {
         val json = extractJsonObject(rawText)
-        return parseLenient(json)
+        return try {
+            parseLenient(json)
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun extractJsonObject(text: String): String {
